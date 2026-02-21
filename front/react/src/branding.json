@@ -1,0 +1,24 @@
+{
+  "brandName": "TuniERP",
+  "title": "TuniERP — Plateforme ERP Modulaire",
+  "company": {
+    "name": "TuniERP",
+    "url": "https://tunierp.com",
+    "socialLink": {
+      "linkedin": "https://www.linkedin.com/company/tunierp",
+      "instagram": "https://www.instagram.com/tunierp",
+      "facebook": "https://www.facebook.com/tunierp",
+      "youtube": "#",
+      "github": "#",
+      "dribble": "#",
+      "discord": "#",
+      "support": "https://tunierp.com/support"
+    }
+  },
+  "logo": {
+    "main": "/tunierplogoDark.png",
+    "logoIcon": "/tunierplogoDark.png",
+    "logoFab": "",
+    "logoWatermark": ""
+  }
+}

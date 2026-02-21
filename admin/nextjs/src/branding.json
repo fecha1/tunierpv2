@@ -1,0 +1,11 @@
+{
+    "brandName": "TuniERP",
+    "company": {
+        "name": "TuniERP",
+        "url": "https://tunierp.com"
+    },
+    "logo": {
+        "main": "/tunierplogoDark.png",
+        "logoIcon": "/tunierplogoDark.png"
+    }
+}
