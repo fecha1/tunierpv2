@@ -12,9 +12,8 @@ export default function SamplePage() {
     <ComponentsWrapper title="Sample Page">
       <PresentationCard title="Basic Card">
         <Typography variant="body2" color="text.secondary">
-          SaasAble offers both a full version and a seed version. The seed version contains minimal code, making it a great starting point
-          for your project. You can then migrate specific features or changes from the full version as needed. We recommend beginning with
-          the seed version for a more streamlined setup.
+          TuniERP offre une solution ERP complète et modulaire. Vous pouvez personnaliser chaque module selon vos besoins : facturation,
+          stock, CRM, comptabilité et bien plus. Commencez par les modules essentiels et ajoutez-en au fur et à mesure.
         </Typography>
       </PresentationCard>
     </ComponentsWrapper>

@@ -13,8 +13,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 // @project
-import branding from '@/branding.json';
-import { DOCS_URL, FREEBIES_URL } from '@/path';
+import { DOCS_URL } from '@/path';
 import { generateFocusVisibleStyles } from '@/utils/CommonFocusStyle';
 
 /***************************  SITEMAP - DATA  ***************************/
@@ -24,23 +23,19 @@ const menuItems = [
   {
     id: 'resources',
     grid: { size: { xs: 12, sm: 'auto' } },
-    title: 'Resources',
+    title: 'Ressources',
     menu: [
-      {
-        label: 'Freebies',
-        link: { href: FREEBIES_URL, ...linkProps }
-      },
       {
         label: 'Documentation',
         link: { href: DOCS_URL, ...linkProps }
       },
       {
-        label: 'Blog',
-        link: { href: 'https://blog.saasable.io/', ...linkProps }
+        label: 'Tarifs',
+        link: { href: '/pricing', ...linkProps }
       },
       {
-        label: 'Refund Policy',
-        link: { href: 'https://mui.com/store/customer-refund-policy/', ...linkProps }
+        label: 'FAQ',
+        link: { href: '/faq', ...linkProps }
       }
     ]
   },
@@ -50,45 +45,34 @@ const menuItems = [
     title: 'Support',
     menu: [
       {
-        label: 'Pricing',
-        link: { href: 'https://mui.com/store/items/saasable-multipurpose-ui-kit-and-dashboard/', ...linkProps }
+        label: 'Centre d\'aide',
+        link: { href: 'https://tunierp.tn/support', ...linkProps }
       },
       {
-        label: 'FAQ',
-        link: { href: 'https://phoenixcoded.gitbook.io/saasable/faq', ...linkProps }
+        label: 'Nous contacter',
+        link: { href: '/contact', ...linkProps }
       },
       {
-        label: 'Support',
-        link: { href: branding.company.socialLink.support, ...linkProps }
-      },
-      {
-        label: 'License Terms',
-        link: { href: 'https://mui.com/store/license/', ...linkProps }
-      },
-      {
-        label: 'Discord',
-        link: { href: branding.company.socialLink.discord, ...linkProps }
+        label: 'Conditions d\'utilisation',
+        link: { href: '/terms', ...linkProps }
       }
     ]
   },
   {
     id: 'company',
     grid: { size: { xs: 6, sm: 'auto' } },
-    title: 'Company',
+    title: 'Entreprise',
     menu: [
       {
-        label: 'Why Phoenixcoded?',
-        link: {
-          href: 'https://blog.saasable.io/a-decade-of-expertise-the-phoenixcoded-story-and-why-you-should-trust-us',
-          ...linkProps
-        }
-      },
-      {
-        label: 'About',
+        label: 'À propos',
         link: { href: '/about', ...linkProps }
       },
       {
-        label: 'Contact Us',
+        label: 'Politique de confidentialité',
+        link: { href: '/privacy', ...linkProps }
+      },
+      {
+        label: 'Nous contacter',
         link: { href: '/contact', ...linkProps }
       }
     ]

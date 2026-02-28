@@ -1,14 +1,14 @@
 {
-  "name": "saasable-ui-free",
+  "name": "tunierp-frontend",
   "version": "2.0.0",
   "author": {
-    "email": "phoenixcoded@gmail.com",
-    "name": "phoenixcoded"
+    "email": "contact@tunierp.tn",
+    "name": "TuniERP"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 4050",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 4050",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
     "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
@@ -28,9 +28,7 @@
     "prop-types": "^15.8.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "react-hook-form": "7.69.0",
-    "react-slick": "^0.31.0",
-    "slick-carousel": "^1.8.1"
+    "react-hook-form": "7.69.0"
   },
   "devDependencies": {
     "@eslint/compat": "1.3.1",

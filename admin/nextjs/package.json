@@ -1,15 +1,15 @@
 {
-  "name": "saas-able-react-mui-admin-next-free",
+  "name": "tunierp-admin",
   "version": "2.0.0",
   "private": false,
   "author": {
-    "email": "phoenixcoded@gmail.com",
-    "name": "phoenixcoded"
+    "email": "contact@tunierp.tn",
+    "name": "TuniERP"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 4051",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 4051",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
     "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",

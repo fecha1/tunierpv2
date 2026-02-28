@@ -116,8 +116,8 @@ export const feature21 = {
   image: '/assets/images/graphics/ai/desktop1-light.svg',
   primaryBtn: { children: 'Free Figma', href: 'https://www.figma.com/community/file/1425095061180549847', ...linkProps },
   secondaryBtn: {
-    children: 'Preview Pro Figma',
-    href: 'https://www.figma.com/design/mlkXfeqxUKqIo0GQhPBqPb/SaasAble---UI-Kit---Preview-only?node-id=11-1833&t=JBHOIIEuYZpmN6v8-1',
+    children: 'En savoir plus',
+    href: 'https://tunierp.tn',
     ...linkProps
   },
   features: [

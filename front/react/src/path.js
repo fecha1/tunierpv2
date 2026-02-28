@@ -4,9 +4,9 @@ function path(urlChunks) {
 
 export const SECTION_PATH = '/sections';
 export const ADMIN_PATH = '/admin';
-export const BUY_NOW_URL = 'https://tunierp.com';
-export const FREEBIES_URL = 'https://tunierp.com';
-export const DOCS_URL = 'https://tunierp.com/docs';
+export const BUY_NOW_URL = 'https://tunierp.tn';
+export const FREEBIES_URL = 'https://tunierp.tn';
+export const DOCS_URL = 'https://tunierp.tn/docs';
 const BLOCK_PATH = '/blocks';
 const AUTH_PATH = 'auth';
 

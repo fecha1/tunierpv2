@@ -9,41 +9,41 @@ export default function typography(theme) {
 
     // heading - large
     h1: {
-      fontWeight: 400,
+      fontWeight: 700,
       fontSize: 57,
 
       // lineHeight = lineHeight in figma / fontSize. i.e 1.123 = 64/57
-      lineHeight: 1.123,
-      letterSpacing: -0.25,
+      lineHeight: 1.1,
+      letterSpacing: -0.5,
       [theme.breakpoints.down('md')]: {
         fontSize: 45,
-        lineHeight: 1.156
+        lineHeight: 1.1
       },
       [theme.breakpoints.down('sm')]: {
         fontSize: 32,
-        lineHeight: 1.222
+        lineHeight: 1.15
       }
     },
 
     // heading - medium
     h2: {
-      fontWeight: 400,
+      fontWeight: 700,
       fontSize: 45,
-      lineHeight: 1.156,
-      letterSpacing: 0,
+      lineHeight: 1.1,
+      letterSpacing: -0.3,
       [theme.breakpoints.down('md')]: {
         fontSize: 36,
-        lineHeight: 1.222
+        lineHeight: 1.15
       },
       [theme.breakpoints.down('sm')]: {
         fontSize: 24,
-        lineHeight: 1.333
+        lineHeight: 1.25
       }
     },
 
     // display - medium
     h3: {
-      fontWeight: 400,
+      fontWeight: 600,
       fontSize: 28,
       lineHeight: 1.286,
       letterSpacing: 0,

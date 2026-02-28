@@ -3,14 +3,12 @@ import PropTypes from 'prop-types';
 
 // @mui
 import { useTheme } from '@mui/material/styles';
-import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
 // @third-party
 import { motion } from 'motion/react';
-import Slider from 'react-slick';
 
 // @project
 import ContainerWrapper from '@/components/ContainerWrapper';
@@ -18,47 +16,26 @@ import GraphicsImage from '@/components/GraphicsImage';
 
 import { withAlpha } from '@/utils/colorUtils';
 import { SECTION_COMMON_PY } from '@/utils/constant';
+import { keyframes } from '@mui/system';
 
-/***************************  CLIENTELE - 3  ***************************/
+const marquee = keyframes`
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+`;
 
-/**
- *
- * Demos:
- * - [Clientele3](https://www.saasable.io/blocks/clientele/clientele3)
- *
- * API:
- * - [Clientele3 API](https://phoenixcoded.gitbook.io/saasable/ui-kit/development/components/clientele/clientele3#props-details)
- */
+/***************************  CLIENTELE - 3  (CSS Marquee) ***************************/
 
 export default function Clientele3({ title, clienteleList }) {
   const theme = useTheme();
 
-  const settings = {
-    autoplay: true,
-    arrows: false,
-    dots: false,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 5,
-    swipeToSlide: true,
-    initialSlide: 0,
-    responsive: [
-      {
-        breakpoint: theme.breakpoints.values.md,
-        settings: { slidesToShow: 4 }
-      },
-      {
-        breakpoint: theme.breakpoints.values.sm,
-        settings: { slidesToShow: 2, centerMode: true }
-      }
-    ]
-  };
+  // Duplicate for seamless infinite scroll
+  const doubledList = [...clienteleList, ...clienteleList];
 
   const shade = {
     content: `' '`,
     zIndex: 1,
     position: 'absolute',
-    width: { sm: 60, xs: 40 },
+    width: { sm: 80, xs: 50 },
     height: 1,
     top: 0,
     background: `linear-gradient(90deg, ${theme.vars.palette.background.default} -8.54%, ${withAlpha(theme.vars.palette.background.default, 0)} 100%)`,
@@ -67,7 +44,7 @@ export default function Clientele3({ title, clienteleList }) {
 
   return (
     <ContainerWrapper sx={{ py: SECTION_COMMON_PY }}>
-      <Stack sx={{ gap: 2.5 }}>
+      <Stack sx={{ gap: 3 }}>
         {title && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -75,46 +52,58 @@ export default function Clientele3({ title, clienteleList }) {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <Typography variant="subtitle2" align="center" sx={{ color: 'text.secondary' }}>
+            <Typography variant="subtitle2" align="center" sx={{ color: 'text.secondary', fontWeight: 500 }}>
               {title}
             </Typography>
           </motion.div>
         )}
-        <Box sx={{ position: 'relative', '&:before': { ...shade, left: 0 }, '&:after': { ...shade, right: 0, rotate: '180deg' } }}>
+        <Box sx={{ position: 'relative', overflow: 'hidden', '&:before': { ...shade, left: 0 }, '&:after': { ...shade, right: 0, rotate: '180deg' } }}>
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{
-              duration: 0.5,
-              delay: 0.4
-            }}
+            transition={{ duration: 0.5, delay: 0.4 }}
           >
-            <Slider {...settings}>
-              {clienteleList.map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, ease: 'easeOut', delay: index * 0.2 }}
-                >
+            <Box
+              sx={{
+                display: 'flex',
+                width: 'max-content',
+                animation: `${marquee} 30s linear infinite`,
+                '&:hover': { animationPlayState: 'paused' }
+              }}
+            >
+              {doubledList.map((item, index) => (
+                <Box key={index} sx={{ px: { xs: 0.5, sm: 1, md: 1.5 }, flexShrink: 0 }}>
                   <Box
                     sx={{
-                      px: { xs: 0.25, sm: 0.5, md: 0.75 },
-                      '& svg': { opacity: 0.4, transition: ' all 0.5s ease-in-out' },
-                      '&:hover svg': { opacity: 1, transition: ' all 0.5s ease-in-out' }
+                      height: { xs: 44, sm: 52, md: 64 },
+                      width: { xs: 100, sm: 140, md: 160 },
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 3,
+                      bgcolor: withAlpha(theme.vars.palette.grey[200], 0.5),
+                      border: '1px solid',
+                      borderColor: withAlpha(theme.vars.palette.divider, 0.1),
+                      px: 2,
+                      transition: 'all 0.3s ease',
+                      '& svg, & img': {
+                        opacity: 0.4,
+                        filter: 'grayscale(100%)',
+                        transition: 'all 0.4s ease'
+                      },
+                      '&:hover': {
+                        bgcolor: withAlpha(theme.vars.palette.background.default, 0.8),
+                        borderColor: withAlpha(theme.vars.palette.primary.main, 0.2),
+                        '& svg, & img': { opacity: 1, filter: 'grayscale(0%)' }
+                      }
                     }}
                   >
-                    <Chip
-                      label={<GraphicsImage {...item} />}
-                      slotProps={{ label: { sx: { p: 0 } } }}
-                      sx={{ bgcolor: 'grey.100', height: { xs: 40, sm: 46, md: 60 }, width: 1 }}
-                    />
+                    <GraphicsImage {...item} />
                   </Box>
-                </motion.div>
+                </Box>
               ))}
-            </Slider>
+            </Box>
           </motion.div>
         </Box>
       </Stack>

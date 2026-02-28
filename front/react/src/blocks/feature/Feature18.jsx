@@ -33,10 +33,8 @@ import GraphicsImage from '@/components/GraphicsImage';
 /**
  *
  * Demos:
- * - [Feature18](https://www.saasable.io/blocks/feature/feature18)
  *
  * API
- * - [Feature18 API](https://phoenixcoded.gitbook.io/saasable/ui-kit/development/components/feature/feature18#props-details)
  */
 
 export default function Feature18({ heading, caption, topics }) {

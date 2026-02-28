@@ -20,17 +20,28 @@ export const hero = {
       </>
     )
   },
-  headLine: 'Gérez votre entreprise avec un ERP modulaire et intelligent',
+  headLine: [
+    'Gérez votre entreprise avec un ERP intelligent',
+    'Facturez, vendez et analysez en un clic',
+    'Digitalisez votre activité en Tunisie'
+  ],
   captionLine: 'POS, facturation, stock, CRM, RH et site web — tout ce dont votre entreprise tunisienne a besoin, dans une seule plateforme.',
   primaryBtn: { children: 'Démarrer gratuitement', href: '/auth/register' },
+  secondaryBtn: { children: 'Voir une démo', href: '#features' },
   videoSrc: '',
   videoThumbnail: '/assets/images/graphics/default/admin-dashboard.png',
   listData: [
-    { image: '/assets/images/shared/react.svg', title: 'Point de Vente' },
-    { image: '/assets/images/shared/next-js.svg', title: 'Facturation' },
-    { image: '/assets/images/shared/material-ui.svg', title: 'Gestion de Stock' },
-    { image: '/assets/images/shared/react.svg', title: 'CRM' },
-    { image: '/assets/images/shared/next-js.svg', title: 'Ressources Humaines' },
-    { image: '/assets/images/shared/material-ui.svg', title: 'Site Web' }
+    { title: '🛒 Point de Vente' },
+    { title: '🧾 Facturation' },
+    { title: '📦 Gestion de Stock' },
+    { title: '👥 CRM' },
+    { title: '👔 Ressources Humaines' },
+    { title: '🌐 Site Web' }
+  ],
+  stats: [
+    { value: '1 000+', label: 'Entreprises' },
+    { value: '16+', label: 'Modules' },
+    { value: '99.9%', label: 'Disponibilité' },
+    { value: '24h', label: 'Support' }
   ]
 };

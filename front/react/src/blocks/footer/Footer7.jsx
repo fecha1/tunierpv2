@@ -29,7 +29,6 @@ import { SECTION_COMMON_PY } from '@/utils/constant';
 /**
  *
  * Demos:
- * - [Footer7](https://www.saasable.io/blocks/footer/footer7)
  */
 
 const linkProps = { target: '_blank', rel: 'noopener noreferrer' };

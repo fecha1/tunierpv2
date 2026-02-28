@@ -17,7 +17,6 @@ import Typography from '@mui/material/Typography';
 
 // @third-party
 import { motion } from 'motion/react';
-import Slider from 'react-slick';
 
 // @project
 import ButtonAnimationWrapper from '@/components/ButtonAnimationWrapper';
@@ -35,10 +34,8 @@ import { SECTION_COMMON_PY } from '@/utils/constant';
 /**
  *
  * Demos:
- * - [FAQ6](https://www.saasable.io/blocks/faq/faq6)
  *
  * API:
- * - [FAQ6 API](https://phoenixcoded.gitbook.io/saasable/ui-kit/development/components/faq/faq6#props-details)
  */
 
 export default function Faq6({ heading, caption, defaultExpanded, faqList, getInTouch, categories, activeCategory }) {
@@ -56,16 +53,13 @@ export default function Faq6({ heading, caption, defaultExpanded, faqList, getIn
   // Handles the expansion of accordion panels
   const handleChange = (panel) => (event, isExpanded) => setExpanded(isExpanded ? panel : false);
 
-  const slickStyle = { '& .slick-slide': { ' > div': { px: { xs: 0.5, md: 0.75 } } } };
-
-  const settings = {
-    arrows: false,
-    dots: false,
-    infinite: false,
-    speed: 500,
-    swipeToSlide: true,
-    initialSlide: 0,
-    variableWidth: true
+  const scrollStyle = {
+    display: 'flex',
+    gap: { xs: 1, md: 1.5 },
+    overflowX: 'auto',
+    scrollbarWidth: 'none',
+    '&::-webkit-scrollbar': { display: 'none' },
+    pb: 0.5
   };
 
   return (
@@ -111,44 +105,46 @@ export default function Faq6({ heading, caption, defaultExpanded, faqList, getIn
               delay: 0.4
             }}
           >
-            <Stack sx={slickStyle}>
-              <Slider {...settings}>
+            <Stack direction="row" sx={scrollStyle}>
+              <Button
+                sx={{
+                  minHeight: { xs: 40, sm: 48 },
+                  color: 'text.primary',
+                  borderColor: 'divider',
+                  bgcolor: activeTopic === '' ? 'grey.100' : 'inherit',
+                  '&.MuiButton-root:hover': { bgcolor: 'grey.100', borderColor: 'divider' },
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0
+                }}
+                variant="outlined"
+                onClick={() => {
+                  setActiveTopic('');
+                  setFilterFaqList(faqList);
+                }}
+              >
+                Tout
+              </Button>
+              {categories.map((item, index) => (
                 <Button
+                  key={index}
                   sx={{
                     minHeight: { xs: 40, sm: 48 },
                     color: 'text.primary',
                     borderColor: 'divider',
-                    bgcolor: activeTopic === '' ? 'grey.100' : 'inherit',
-                    '&.MuiButton-root:hover': { bgcolor: 'grey.100', borderColor: 'divider' }
+                    bgcolor: activeTopic === item ? 'grey.100' : 'inherit',
+                    '&.MuiButton-root:hover': { bgcolor: 'grey.100', borderColor: 'divider' },
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0
                   }}
                   variant="outlined"
                   onClick={() => {
-                    setActiveTopic('');
-                    setFilterFaqList(faqList);
+                    setActiveTopic(item);
+                    setFilterFaqList(faqList.filter((list) => list.category === item));
                   }}
                 >
-                  All
+                  {item}
                 </Button>
-                {categories.map((item, index) => (
-                  <Button
-                    key={index}
-                    sx={{
-                      minHeight: { xs: 40, sm: 48 },
-                      color: 'text.primary',
-                      borderColor: 'divider',
-                      bgcolor: activeTopic === item ? 'grey.100' : 'inherit',
-                      '&.MuiButton-root:hover': { bgcolor: 'grey.100', borderColor: 'divider' }
-                    }}
-                    variant="outlined"
-                    onClick={() => {
-                      setActiveTopic(item);
-                      setFilterFaqList(faqList.filter((list) => list.category === item));
-                    }}
-                  >
-                    {item}
-                  </Button>
-                ))}
-              </Slider>
+              ))}
             </Stack>
           </motion.div>
           <Stack

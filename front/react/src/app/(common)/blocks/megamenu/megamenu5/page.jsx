@@ -70,7 +70,7 @@ const data = {
     {
       title: 'External',
       itemsList: [
-        { title: 'Blog', link: { href: 'https://blog.saasable.io/', target: '_blank' } },
+        { title: 'Blog', link: { href: 'https://tunierp.tn/blog', target: '_blank' } },
         { title: 'Documentation', link: { href: DOCS_URL, target: '_blank' } },
         { title: 'Support', link: { href: 'https://codedthemes.support-hub.io/', target: '_blank' } },
         {

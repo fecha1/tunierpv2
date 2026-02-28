@@ -10,7 +10,7 @@ export const cta4 = {
   headLine: 'Pourquoi choisir TuniERP pour votre entreprise ?',
   primaryBtn: {
     children: 'Découvrir TuniERP',
-    href: 'https://tunierp.com',
+    href: 'https://tunierp.tn',
     target: '_blank',
     rel: 'noopener noreferrer'
   },

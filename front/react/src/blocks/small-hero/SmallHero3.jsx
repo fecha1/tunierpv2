@@ -16,10 +16,8 @@ import { SECTION_COMMON_PY } from '@/utils/constant';
 /**
  *
  * Demos:
- * - [SmallHero3](https://www.saasable.io/blocks/small-hero/small-hero3)
  *
  * API
- * - [SmallHero3 API](https://phoenixcoded.gitbook.io/saasable/ui-kit/development/components/smallhero/smallhero3#props-details)
  */
 
 export default function SmallHero3({ chip, headLine, captionLine, exploreBtn }) {

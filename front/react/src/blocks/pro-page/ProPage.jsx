@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 
 // @mui
 import Button from '@mui/material/Button';
-import CardMedia from '@mui/material/CardMedia';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
@@ -36,13 +35,13 @@ export default function ProPage({ image }) {
               }}
             />
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1, mt: { xs: 4, md: 7 }, textAlign: 'center' }}>
-              Discover the Components Not Available in the Free Version
+              Découvrez les composants premium TuniERP
             </Typography>
             <Typography variant="body1" color="textSecondary" sx={{ mb: 3, color: 'grey.700', textAlign: 'center' }}>
-              <Link href="https://www.saasable.io/" target="_blank" underline="hover" component={NextLink}>
-                Check out SaasAble PRO
+              <Link href="https://tunierp.tn" target="_blank" underline="hover" component={NextLink}>
+                Découvrir TuniERP Pro
               </Link>{' '}
-              which offers updated components, auto layout, and Figma new variables, complete with dark mode!
+              avec des composants avancés, le mode sombre et bien plus encore !
             </Typography>
 
             <Grid container spacing={2} justifyContent="center">
@@ -50,12 +49,12 @@ export default function ProPage({ image }) {
                 <Button
                   variant="outlined"
                   component={NextLink}
-                  href="https://www.figma.com/design/mlkXfeqxUKqIo0GQhPBqPb/SaasAble---UI-Kit---Preview-only?node-id=11-1833&t=JBHOIIEuYZpmN6v8-1"
+                  href="https://tunierp.tn"
                   target="_blank"
                   sx={{ minWidth: 215 }}
-                  startIcon={<CardMedia component="img" src="/assets/images/shared/figma.svg" sx={{ width: 16, height: 16 }} alt="figma" />}
+                  startIcon={<SvgIcon name="tabler-external-link" size={16} stroke={3} />}
                 >
-                  Preview Pro
+                  En savoir plus
                 </Button>
               </Grid>
               <Grid>
@@ -64,11 +63,11 @@ export default function ProPage({ image }) {
                     variant="contained"
                     color="primary"
                     component={NextLink}
-                    href={'https://www.saasable.io/sections'}
+                    href={'https://tunierp.tn'}
                     target="_blank"
                     startIcon={<SvgIcon name="tabler-sparkles" size={16} stroke={3} color="background.default" />}
                   >
-                    View Pro Component
+                    Voir les composants Pro
                   </Button>
                 </ButtonAnimationWrapper>
               </Grid>

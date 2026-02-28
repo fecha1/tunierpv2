@@ -89,7 +89,7 @@ export default function AuthRegister({ inputSx }) {
           <InputLabel>Email</InputLabel>
           <OutlinedInput
             {...register('email', emailSchema)}
-            placeholder="example@saasable.io"
+            placeholder="exemple@tunierp.tn"
             fullWidth
             error={Boolean(errors.email)}
             sx={{ ...inputSx }}
