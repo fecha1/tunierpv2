@@ -1,0 +1,333 @@
+import { prisma, withTenantScope } from '@tunierp/database';
+
+// ── Document Number Generator ─────────────────────────────
+
+async function generateDocNumber(tenantId: string, docType: string): Promise<string> {
+  const year = new Date().getFullYear();
+
+  const seq = await prisma.documentSequence.findFirst({
+    where: { tenantId, docType, year },
+  });
+
+  if (!seq) {
+    throw new Error(`Séquence de document manquante pour ${docType}-${year}`);
+  }
+
+  const nextNumber = seq.lastNumber + 1;
+
+  await prisma.documentSequence.update({
+    where: { id: seq.id },
+    data: { lastNumber: nextNumber },
+  });
+
+  // Format: DEV-2026-00001
+  const paddedNumber = String(nextNumber).padStart(5, '0');
+  return `${seq.prefix}-${year}-${paddedNumber}`;
+}
+
+// ── Sales Service ─────────────────────────────────────────
+
+/**
+ * List sales documents (quotes, invoices, delivery notes, etc.)
+ */
+export async function listSales(
+  tenantId: string,
+  filters?: { type?: string; status?: string; customerId?: string; search?: string; limit?: number; offset?: number },
+) {
+  const scoped = withTenantScope(prisma, tenantId);
+
+  const where: any = {};
+  if (filters?.type) where.type = filters.type;
+  if (filters?.status) where.status = filters.status;
+  if (filters?.customerId) where.customerId = filters.customerId;
+
+  const [data, total] = await Promise.all([
+    scoped.sale.findMany({
+      where,
+      include: {
+        customer: { select: { id: true, name: true, email: true } },
+        items: { select: { id: true, productId: true, quantity: true, unitPrice: true, total: true, product: { select: { name: true } } } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: filters?.limit || 25,
+      skip: filters?.offset || 0,
+    }),
+    scoped.sale.count({ where }),
+  ]);
+
+  return { data, total, limit: filters?.limit || 25, offset: filters?.offset || 0 };
+}
+
+/**
+ * Get single sale by ID
+ */
+export async function getSaleById(tenantId: string, saleId: string) {
+  const sale = await prisma.sale.findFirst({
+    where: { id: saleId, tenantId },
+    include: {
+      customer: true,
+      items: {
+        include: { product: { select: { name: true, sku: true } }, variant: { select: { name: true, sku: true } } },
+      },
+    },
+  });
+
+  if (!sale) throw new Error('Document introuvable');
+  return sale;
+}
+
+/**
+ * Create a sale document (quote, invoice, delivery note, etc.)
+ */
+export async function createSale(
+  tenantId: string,
+  data: {
+    type: 'quote' | 'invoice' | 'delivery_note' | 'proforma' | 'credit_note' | 'warranty';
+    customerId?: string;
+    items: Array<{
+      productId: string;
+      variantId?: string;
+      quantity: number;
+      unitPrice: number;
+      discount?: number;
+      taxRate?: number;
+    }>;
+    notes?: string;
+    userId: string;
+  },
+) {
+  // Map type to document code
+  const typeToCode: Record<string, string> = {
+    quote: 'DEV',
+    invoice: 'FAC',
+    delivery_note: 'BL',
+    proforma: 'PRO',
+    credit_note: 'AVF',
+    warranty: 'GAR',
+  };
+
+  const docCode = typeToCode[data.type] || 'FAC';
+  const docNumber = await generateDocNumber(tenantId, docCode);
+
+  // Calculate totals
+  let subtotal = 0;
+  let totalTax = 0;
+  const saleItems = data.items.map((item) => {
+    const lineTotal = item.quantity * item.unitPrice;
+    const discountAmount = lineTotal * ((item.discount || 0) / 100);
+    const taxableAmount = lineTotal - discountAmount;
+    const tax = taxableAmount * ((item.taxRate || 19) / 100);
+    subtotal += taxableAmount;
+    totalTax += tax;
+
+    return {
+      productId: item.productId,
+      variantId: item.variantId,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      discount: item.discount || 0,
+      taxRate: item.taxRate || 19,
+      taxAmount: Math.round(tax * 1000) / 1000,
+      total: Math.round((taxableAmount + tax) * 1000) / 1000,
+    };
+  });
+
+  const stampDuty = 1; // 1 TND droit de timbre
+  const grandTotal = Math.round((subtotal + totalTax + stampDuty) * 1000) / 1000;
+
+  const sale = await prisma.sale.create({
+    data: {
+      tenantId,
+      type: data.type as any,
+      number: docNumber,
+      customerId: data.customerId,
+      status: 'draft',
+      subtotal,
+      taxAmount: totalTax,
+      stampDuty,
+      total: grandTotal,
+      notes: data.notes,
+      items: {
+        create: saleItems.map((item) => ({ tenantId, ...item })),
+      },
+    },
+    include: { items: true, customer: true },
+  });
+
+  return sale;
+}
+
+/**
+ * Update sale status (draft → confirmed → delivered → paid / cancelled)
+ */
+export async function updateSaleStatus(
+  tenantId: string,
+  saleId: string,
+  status: string,
+) {
+  const sale = await prisma.sale.findFirst({ where: { id: saleId, tenantId } });
+  if (!sale) throw new Error('Document introuvable');
+
+  return prisma.sale.update({
+    where: { id: saleId },
+    data: { status: status as any },
+  });
+}
+
+/**
+ * Convert quote to invoice
+ */
+export async function convertQuoteToInvoice(tenantId: string, quoteId: string, userId: string) {
+  const quote = await prisma.sale.findFirst({
+    where: { id: quoteId, tenantId, type: 'quote' },
+    include: { items: true },
+  });
+
+  if (!quote) throw new Error('Devis introuvable');
+
+  const invoiceNumber = await generateDocNumber(tenantId, 'FAC');
+
+  const invoice = await prisma.sale.create({
+    data: {
+      tenantId,
+      type: 'invoice',
+      number: invoiceNumber,
+      customerId: quote.customerId,
+      status: 'confirmed',
+      subtotal: quote.subtotal,
+      taxAmount: quote.taxAmount,
+      stampDuty: quote.stampDuty,
+      total: quote.total,
+      notes: `Converti du devis ${quote.number}`,
+      items: {
+        create: quote.items.map((item) => ({
+          tenantId,
+          productId: item.productId,
+          variantId: item.variantId,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          discount: item.discount,
+          taxRate: item.taxRate,
+          taxAmount: item.taxAmount,
+          total: item.total,
+        })),
+      },
+    },
+    include: { items: true, customer: true },
+  });
+
+  // Mark quote as converted
+  await prisma.sale.update({
+    where: { id: quoteId },
+    data: { status: 'converted' as any },
+  });
+
+  return invoice;
+}
+
+// ── Payments Service ───────────────────────────────────────
+
+export async function listPayments(
+  tenantId: string,
+  filters?: { saleId?: string; method?: string; limit?: number },
+) {
+  const scoped = withTenantScope(prisma, tenantId);
+
+  const where: any = {};
+  if (filters?.saleId) where.saleId = filters.saleId;
+  if (filters?.method) where.method = filters.method;
+
+  return scoped.payment.findMany({
+    where,
+    include: {
+      sale: { select: { number: true, type: true, total: true } },
+      customer: { select: { name: true } },
+    },
+    orderBy: { paymentDate: 'desc' },
+    take: filters?.limit || 25,
+  });
+}
+
+export async function createPayment(
+  tenantId: string,
+  data: {
+    saleId: string;
+    customerId?: string;
+    amount: number;
+    method: string;
+    reference?: string;
+    notes?: string;
+  },
+) {
+  const payment = await prisma.payment.create({
+    data: {
+      tenantId,
+      saleId: data.saleId,
+      customerId: data.customerId,
+      amount: data.amount,
+      method: data.method as any,
+      reference: data.reference,
+      notes: data.notes,
+      status: 'completed',
+      paymentDate: new Date(),
+    },
+  });
+
+  // Check if sale is fully paid
+  const sale = await prisma.sale.findUnique({ where: { id: data.saleId } });
+  if (sale) {
+    const totalPaid = await prisma.payment.aggregate({
+      where: { saleId: data.saleId, status: 'completed' },
+      _sum: { amount: true },
+    });
+
+    if ((totalPaid._sum.amount || 0) >= sale.total) {
+      await prisma.sale.update({
+        where: { id: data.saleId },
+        data: { status: 'paid', paidAt: new Date() },
+      });
+    } else {
+      await prisma.sale.update({
+        where: { id: data.saleId },
+        data: { status: 'partial' as any },
+      });
+    }
+  }
+
+  return payment;
+}
+
+// ── Dashboard Stats ────────────────────────────────────────
+
+export async function getInvoicingStats(tenantId: string) {
+  const scoped = withTenantScope(prisma, tenantId);
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const [
+    monthlyRevenue,
+    unpaidInvoices,
+    totalQuotes,
+    totalInvoices,
+  ] = await Promise.all([
+    scoped.sale.aggregate({
+      where: { type: 'invoice', status: 'paid', paidAt: { gte: startOfMonth } },
+      _sum: { total: true },
+    }),
+    scoped.sale.aggregate({
+      where: { type: 'invoice', status: { in: ['confirmed', 'delivered'] } },
+      _sum: { total: true },
+      _count: true,
+    }),
+    scoped.sale.count({ where: { type: 'quote', createdAt: { gte: startOfMonth } } }),
+    scoped.sale.count({ where: { type: 'invoice', createdAt: { gte: startOfMonth } } }),
+  ]);
+
+  return {
+    monthlyRevenue: monthlyRevenue._sum.total || 0,
+    unpaidAmount: unpaidInvoices._sum.total || 0,
+    unpaidCount: unpaidInvoices._count || 0,
+    monthlyQuotes: totalQuotes,
+    monthlyInvoices: totalInvoices,
+  };
+}

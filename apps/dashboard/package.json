@@ -1,0 +1,31 @@
+{
+  "name": "@tunierp/dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 4052",
+    "build": "next build",
+    "start": "next start -p 4052",
+    "lint": "next lint",
+    "clean": "rm -rf .next"
+  },
+  "dependencies": {
+    "next": "^15.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@mui/material": "^7.1.0",
+    "@mui/icons-material": "^7.1.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@tabler/icons-react": "^3.30.0",
+    "axios": "^1.8.0",
+    "zustand": "^5.0.3",
+    "js-cookie": "^3.0.5"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/js-cookie": "^3.0.6",
+    "typescript": "^5.7.0"
+  }
+}

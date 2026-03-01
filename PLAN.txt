@@ -1,0 +1,312 @@
+================================================================================
+                        TuniERP — Architecture & Plan
+================================================================================
+
+  Monorepo multi-tenant ERP SaaS pour entreprises tunisiennes
+  Stack: Turborepo + pnpm · NestJS · Next.js · Prisma · PostgreSQL
+  Marque: #101c37 / #264b8d · Domaine: tunierp.tn · UI en français
+
+================================================================================
+  1. STRUCTURE DU MONOREPO
+================================================================================
+
+  tunierpv2/
+  ├── turbo.json                    Turborepo config (build, dev, lint, db:*)
+  ├── pnpm-workspace.yaml           Workspaces: apps/*, packages/*, packages/modules/*
+  ├── tsconfig.base.json            ES2022, strict, bundler resolution
+  ├── .npmrc                        auto-install-peers, shamefully-hoist
+  │
+  ├── packages/
+  │   ├── database/                 @tunierp/database
+  │   │   ├── prisma/schema.prisma  30+ modèles, 14 enums, multi-tenant (tenant_id)
+  │   │   ├── prisma/seed.ts        Plans, modules, rôles, demo tenant, séquences
+  │   │   ├── src/client.ts         PrismaClient singleton + Accelerate
+  │   │   ├── src/tenant-scope.ts   Extension Prisma auto-inject tenant_id (22 modèles)
+  │   │   ├── src/types.ts          Re-export tous les types Prisma
+  │   │   └── src/index.ts          Barrel export
+  │   │
+  │   ├── auth/                     @tunierp/auth
+  │   │   ├── src/tokens.ts         JWT access (15min) + refresh (7j)
+  │   │   ├── src/utils/password.ts bcrypt (12 rounds)
+  │   │   ├── src/permissions.ts    30+ permissions, wildcards (*), français
+  │   │   ├── src/guards/auth.guard.ts  authenticate(), requirePermission(), requireModule()
+  │   │   └── src/index.ts          Barrel export
+  │   │
+  │   ├── core/                     @tunierp/core
+  │   │   ├── src/manifest.ts       ModuleManifest, SidebarItem, SettingField types
+  │   │   ├── src/registry.ts       registerModule(), buildSidebar(), checkDependencies()
+  │   │   └── src/index.ts          Barrel export
+  │   │
+  │   └── modules/
+  │       ├── inventory/            @tunierp/mod-inventory
+  │       │   ├── src/manifest.ts   Gestion de Stock — 6 permissions, 4 sidebar items
+  │       │   └── src/service.ts    getStockLevels, createMovement, getWarehouses, stats
+  │       │
+  │       ├── invoicing/            @tunierp/mod-invoicing
+  │       │   ├── src/manifest.ts   Facturation — 7 permissions, 5 sidebar items
+  │       │   └── src/service.ts    createSale, convertQuoteToInvoice, payments, stats
+  │       │
+  │       ├── purchases/            @tunierp/mod-purchases
+  │       │   ├── src/manifest.ts   Achats & Fournisseurs — 6 permissions, 4 sidebar items
+  │       │   └── src/service.ts    createPurchaseOrder, receivePurchaseOrder, suppliers
+  │       │
+  │       └── pos/                  @tunierp/mod-pos
+  │           ├── src/manifest.ts   Point de Vente — 6 permissions, 3 sidebar items
+  │           └── src/service.ts    createPOSSale, searchProducts, getPOSStats
+  │
+  ├── apps/
+  │   ├── api/                      @tunierp/api — port 4060
+  │   │   ├── src/main.ts           NestJS bootstrap, Swagger /api/docs, CORS
+  │   │   ├── src/app.module.ts     Imports: Database, Auth, Tenants, Registry, 4 ERP modules
+  │   │   ├── src/bootstrap-modules.ts  Enregistre les 4 manifests au démarrage
+  │   │   ├── src/shared/
+  │   │   │   ├── database.module.ts    Global Prisma DI
+  │   │   │   ├── guards/jwt-auth.guard.ts  JWT + module + permission checks
+  │   │   │   └── decorators/index.ts   @Auth, @TenantId, @Permissions, @RequireModule
+  │   │   └── src/modules/
+  │   │       ├── health/           GET /health — DB ping
+  │   │       ├── auth/             POST login, register, refresh, logout, me
+  │   │       ├── tenants/          GET|PATCH current, users, roles, subscription, upgrade
+  │   │       ├── registry/         GET catalog|registered|active|sidebar, POST activate|deactivate
+  │   │       ├── inventory/        GET stats|stock|movements|warehouses, POST movements|warehouses
+  │   │       ├── invoicing/        GET stats|sales|payments, POST sales|payments, PATCH status
+  │   │       ├── purchases/        GET stats|orders|suppliers, POST orders|suppliers, receive
+  │   │       └── pos/              GET stats|products, POST sell
+  │   │
+  │   └── dashboard/                @tunierp/dashboard — port 4052
+  │       ├── src/app/layout.tsx    Root layout, Inter font, français
+  │       ├── src/app/page.tsx      Auto-redirect login/dashboard
+  │       ├── src/app/login/        Page de connexion
+  │       ├── src/app/dashboard/
+  │       │   ├── layout.tsx        Shell: Sidebar + Header + main
+  │       │   ├── page.tsx          Tableau de bord: stats, modules actifs
+  │       │   ├── settings/         Gestion des modules (activer/désactiver)
+  │       │   └── [...slug]/        Catch-all pour pages de modules
+  │       ├── src/components/
+  │       │   ├── Sidebar.tsx       Sidebar dynamique (groupes par catégorie, permissions)
+  │       │   └── Header.tsx        Barre de recherche, notifications, profil
+  │       ├── src/stores/
+  │       │   ├── auth.ts           Zustand: login, logout, loadSession
+  │       │   └── sidebar.ts        Zustand: loadSidebar, toggleCollapse
+  │       └── src/lib/api.ts        Axios + JWT interceptor + auto-refresh
+  │
+  ├── front/                         Site marketing — port 4050 (existant)
+  │   └── src/app/(default)/onboarding/page.jsx
+  │       4 étapes: Plan → Type d'activité → Entreprise → Compte
+  │
+  └── admin/nextjs/                 Admin panel — port 4051 (existant)
+
+
+================================================================================
+  2. BASE DE DONNÉES — 30+ MODÈLES
+================================================================================
+
+  Tenant          Plan             Module           PlanModule
+  TenantModule    User             Role             Session
+  RefreshToken    MfaConfig        AuditLog         Category
+  Brand           Unit             Product          ProductVariant
+  Warehouse       Inventory        InventoryMovement
+  CustomerGroup   Customer         Sale             SaleItem
+  BankAccount     Payment          DocumentSequence
+  Supplier        Purchase         PurchaseItem
+  WebsiteTemplate WebsitePage      WebsiteSettings
+
+  14 Enums: TenantStatus, BusinessType, RoleLevel, SaleType, SaleStatus,
+            PaymentStatus, PaymentType, PaymentMethod, MovementType,
+            ReferenceType, PurchaseType, PurchaseStatus, PageType, DocumentCode
+
+
+================================================================================
+  3. API — 25+ ENDPOINTS (NestJS, port 4060)
+================================================================================
+
+  Préfixe: /api/v1
+
+  AUTH
+    POST /auth/login              Email + mot de passe → tokens + user + tenant
+    POST /auth/register           Onboarding complet: tenant + rôles + modules + warehouse
+    POST /auth/refresh            Rotation refresh token
+    POST /auth/logout             Révoquer tous les refresh tokens
+    POST /auth/me                 Infos utilisateur courant (protégé JWT)
+
+  TENANTS
+    GET  /tenants/current         Détails du tenant + plan + counts
+    PATCH /tenants/current        Modifier nom, logo, settings, adresse...
+    GET  /tenants/current/users   Liste des utilisateurs du tenant
+    POST /tenants/current/users   Créer un utilisateur (vérif limite plan)
+    GET  /tenants/current/roles   Liste des rôles
+    GET  /tenants/current/subscription  Plan + modules actifs + usage
+    POST /tenants/current/upgrade Changer de plan + activer nouveaux modules
+
+  MODULES
+    GET  /modules/catalog         Catalogue complet (public, pour page pricing)
+    GET  /modules/registered      Manifests enregistrés (protégé)
+    GET  /modules/active          Modules actifs du tenant
+    GET  /modules/sidebar         Menu sidebar dynamique (filtré par permissions)
+    POST /modules/:code/activate  Activer un module (vérif dépendances + plan)
+    POST /modules/:code/deactivate Désactiver (vérif dépendants)
+
+  INVENTORY
+    GET  /inventory/stats         Produits total, stock total, stock faible, mouvements
+    GET  /inventory/stock         Niveaux de stock (filtres: entrepôt, catégorie, recherche)
+    GET  /inventory/movements     Historique des mouvements
+    POST /inventory/movements     Créer un mouvement (entrée/sortie/ajustement/transfert)
+    GET  /inventory/warehouses    Liste des entrepôts
+    POST /inventory/warehouses    Créer un entrepôt
+    PATCH /inventory/warehouses/:id Modifier un entrepôt
+
+  INVOICING
+    GET  /invoicing/stats         CA mensuel, factures impayées, top clients
+    GET  /invoicing/sales         Liste ventes (type, statut, client, recherche, pagination)
+    GET  /invoicing/sales/:id     Détail d'une vente
+    POST /invoicing/sales         Créer devis/facture/BL/proforma/avoir/garantie
+    PATCH /invoicing/sales/:id/status  Changer statut
+    POST /invoicing/sales/:id/convert  Convertir devis → facture
+    GET  /invoicing/payments      Liste des paiements
+    POST /invoicing/payments      Enregistrer un paiement
+
+  PURCHASES
+    GET  /purchases/stats         Achats mensuels, BC en attente, nb fournisseurs
+    GET  /purchases/orders        Liste des bons de commande
+    POST /purchases/orders        Créer un bon de commande
+    POST /purchases/orders/:id/receive  Réceptionner (→ entrée stock auto)
+    GET  /purchases/suppliers     Liste fournisseurs
+    POST /purchases/suppliers     Créer un fournisseur
+    PATCH /purchases/suppliers/:id Modifier un fournisseur
+
+  POS
+    GET  /pos/stats               Tickets du jour, CA, espèces, panier moyen
+    GET  /pos/products?q=         Recherche rapide (code-barres, SKU, nom)
+    POST /pos/sell                Vente POS → ticket + paiement + sortie stock
+
+
+================================================================================
+  4. SYSTÈME DE MODULES
+================================================================================
+
+  Chaque module = 1 package indépendant avec:
+    manifest.ts   → code, nom, catégorie, icône, permissions, sidebar, settings
+    service.ts    → Logique métier (queries Prisma scoped par tenant)
+
+  Modules disponibles:
+  ┌──────────────┬──────────────────────────┬────────────┬─────────────┐
+  │ Code         │ Nom                      │ Catégorie  │ Core?       │
+  ├──────────────┼──────────────────────────┼────────────┼─────────────┤
+  │ core         │ Noyau                    │ général    │ ✅ Oui      │
+  │ products     │ Catalogue Produits       │ général    │ ✅ Oui      │
+  │ customers    │ Gestion Clients          │ ventes     │ ✅ Oui      │
+  │ dashboard    │ Tableau de bord          │ général    │ ✅ Oui      │
+  │ invoicing    │ Facturation & Ventes     │ ventes     │ ❌ Non      │
+  │ inventory    │ Gestion de Stock         │ stock      │ ❌ Non      │
+  │ pos          │ Point de Vente (Caisse)  │ ventes     │ ❌ Non      │
+  │ purchases    │ Achats & Fournisseurs    │ achats     │ ❌ Non      │
+  │ accounting   │ Comptabilité             │ finance    │ ❌ Non      │
+  │ hr           │ Ressources Humaines      │ rh         │ ❌ Non      │
+  │ crm          │ Gestion Relation Client  │ marketing  │ ❌ Non      │
+  │ reports      │ Rapports & Analyses      │ rapports   │ ❌ Non      │
+  │ website      │ Site Web                 │ web        │ ❌ Non      │
+  │ ecommerce    │ Boutique en ligne        │ web        │ ❌ Non      │
+  │ loyalty      │ Programme de Fidélité    │ marketing  │ ❌ Non      │
+  │ delivery     │ Gestion des Livraisons   │ ventes     │ ❌ Non      │
+  └──────────────┴──────────────────────────┴────────────┴─────────────┘
+
+  Plans:
+  ┌───────────────┬───────────┬────────┬──────────┬──────────────────────────┐
+  │ Plan          │ Prix/mois │ Users  │ Produits │ Modules                  │
+  ├───────────────┼───────────┼────────┼──────────┼──────────────────────────┤
+  │ Starter       │ Gratuit   │ 2      │ 100      │ 4 core                   │
+  │ Business      │ 49 TND    │ 10     │ 5 000    │ + invoicing, inventory   │
+  │ Professional  │ 99 TND    │ 25     │ 50 000   │ + pos, purchases, reports│
+  │ Enterprise    │ 199 TND   │ ∞      │ ∞        │ Tous les modules         │
+  └───────────────┴───────────┴────────┴──────────┴──────────────────────────┘
+
+
+================================================================================
+  5. SÉCURITÉ & AUTH
+================================================================================
+
+  • JWT Access Token  — 15 min, payload: userId, tenantId, email, roleCode, roleLevel
+  • JWT Refresh Token — 7 jours, stocké en DB, rotation automatique
+  • Mots de passe     — bcrypt, 12 salt rounds
+  • RBAC              — Permissions avec wildcards (ex: "sales.*", "*" = super admin)
+  • Rôles par défaut  — Administrateur (90), Gérant (70), Comptable (60),
+                         Commercial (40), Caissier (30), Magasinier (25), Consultant (10)
+  • Guards NestJS     — JWT + vérif module activé + vérif permission
+
+
+================================================================================
+  6. PORTS & SERVICES
+================================================================================
+
+  ┌─────────────────┬──────┬─────────────────────────────────┐
+  │ Service         │ Port │ Description                     │
+  ├─────────────────┼──────┼─────────────────────────────────┤
+  │ front/          │ 4050 │ Site marketing (existant)       │
+  │ admin/nextjs    │ 4051 │ Admin panel (existant)          │
+  │ apps/dashboard  │ 4052 │ Dashboard client (nouveau)      │
+  │ apps/api        │ 4060 │ API NestJS + Swagger            │
+  └─────────────────┴──────┴─────────────────────────────────┘
+
+  Swagger docs: http://localhost:4060/api/docs
+
+
+================================================================================
+  7. COMMANDES
+================================================================================
+
+  # Installer les dépendances
+  pnpm install
+
+  # Générer le client Prisma
+  pnpm run db:generate
+
+  # Pousser le schéma vers la DB
+  pnpm run db:push
+
+  # Seeder la base
+  pnpm run db:seed
+
+  # Lancer tout en dev (Turborepo parallel)
+  pnpm run dev
+
+  # Lancer individuellement
+  pnpm run dev:web         # front/ port 4050
+  pnpm run dev:dashboard   # apps/dashboard port 4052
+  pnpm run dev:api         # apps/api port 4060
+
+  # Build production
+  pnpm run build
+
+
+================================================================================
+  8. PROCHAINES ÉTAPES
+================================================================================
+
+  [ ] UI complètes pour chaque module dans le dashboard
+      - Inventory: tableau stock, formulaire mouvement, gestion entrepôts
+      - Invoicing: liste factures, éditeur devis/facture, impression PDF
+      - Purchases: liste BC, formulaire commande, réception
+      - POS: interface caisse tactile, panier, recherche produit, paiement
+
+  [ ] Modules supplémentaires (backend + frontend)
+      - Comptabilité (journal, grand livre, bilan)
+      - RH (employés, pointage, paie)
+      - CRM (prospects, pipeline, activités)
+      - Rapports (CA, marges, stock, tableaux de bord BI)
+
+  [ ] Fonctionnalités avancées
+      - Génération PDF (factures, BC, tickets) avec template personnalisable
+      - Notifications temps réel (WebSocket)
+      - Import/Export CSV/Excel
+      - Sauvegarde automatique
+      - Audit log complet
+
+  [ ] Déploiement
+      - Docker Compose (API + Dashboard + Frontend)
+      - CI/CD GitHub Actions
+      - SSL + domaine tunierp.tn
+      - Monitoring (health checks, logs)
+
+================================================================================
+  Dernière mise à jour: 1 mars 2026
+================================================================================

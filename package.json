@@ -1,0 +1,33 @@
+{
+  "name": "tunierp",
+  "version": "2.0.0",
+  "private": true,
+  "author": {
+    "name": "TuniERP",
+    "email": "contact@tunierp.tn",
+    "url": "https://tunierp.tn"
+  },
+  "description": "TuniERP — Plateforme ERP multi-tenant modulaire pour entreprises tunisiennes",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:web": "turbo run dev --filter=tunierp-frontend",
+    "dev:dashboard": "turbo run dev --filter=@tunierp/dashboard",
+    "dev:api": "turbo run dev --filter=@tunierp/api",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "db:generate": "turbo run db:generate --filter=@tunierp/database",
+    "db:push": "turbo run db:push --filter=@tunierp/database",
+    "db:seed": "turbo run db:seed --filter=@tunierp/database",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

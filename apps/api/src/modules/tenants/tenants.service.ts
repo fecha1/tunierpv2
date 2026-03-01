@@ -1,0 +1,181 @@
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { prisma, withTenantScope } from '@tunierp/database';
+
+@Injectable()
+export class TenantsService {
+  /**
+   * Get tenant details by ID
+   */
+  async getTenant(tenantId: string) {
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: tenantId },
+      include: {
+        plan: { select: { id: true, name: true, code: true, maxUsers: true, maxProducts: true } },
+        _count: { select: { users: true, modules: true } },
+      },
+    });
+
+    if (!tenant) {
+      throw new NotFoundException('Entreprise introuvable');
+    }
+
+    return tenant;
+  }
+
+  /**
+   * Update tenant settings
+   */
+  async updateTenant(tenantId: string, data: {
+    name?: string;
+    logoUrl?: string;
+    settings?: Record<string, any>;
+    phone?: string;
+    taxId?: string;
+    address?: string;
+    city?: string;
+    country?: string;
+  }) {
+    const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+    if (!tenant) {
+      throw new NotFoundException('Entreprise introuvable');
+    }
+
+    return prisma.tenant.update({
+      where: { id: tenantId },
+      data: {
+        ...(data.name && { name: data.name }),
+        ...(data.logoUrl !== undefined && { logoUrl: data.logoUrl }),
+        ...(data.phone !== undefined && { phone: data.phone }),
+        ...(data.taxId !== undefined && { taxId: data.taxId }),
+        ...(data.address !== undefined && { address: data.address }),
+        ...(data.city !== undefined && { city: data.city }),
+        ...(data.country !== undefined && { country: data.country }),
+        ...(data.settings && {
+          settings: { ...(tenant.settings as Record<string, any>), ...data.settings },
+        }),
+      },
+    });
+  }
+
+  /**
+   * List tenant users
+   */
+  async listUsers(tenantId: string) {
+    const scoped = withTenantScope(prisma, tenantId);
+    return scoped.user.findMany({
+      include: { role: { select: { name: true, code: true, level: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  /**
+   * Create a user for tenant
+   */
+  async createUser(tenantId: string, data: {
+    email: string;
+    passwordHash: string;
+    firstName: string;
+    lastName: string;
+    roleId: string;
+    phone?: string;
+  }) {
+    // Check user limit
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: tenantId },
+      include: { plan: true, _count: { select: { users: true } } },
+    });
+
+    if (!tenant) throw new NotFoundException('Entreprise introuvable');
+
+    if (tenant.plan.maxUsers > 0 && tenant._count.users >= tenant.plan.maxUsers) {
+      throw new BadRequestException(
+        `Limite d'utilisateurs atteinte (${tenant.plan.maxUsers}). Passez à un plan supérieur.`,
+      );
+    }
+
+    // Check email uniqueness within tenant
+    const existing = await prisma.user.findFirst({
+      where: { tenantId, email: data.email },
+    });
+    if (existing) {
+      throw new BadRequestException('Cet email est déjà utilisé dans votre entreprise');
+    }
+
+    return prisma.user.create({
+      data: { tenantId, ...data, isActive: true },
+      include: { role: { select: { name: true, code: true, level: true } } },
+    });
+  }
+
+  /**
+   * List tenant roles
+   */
+  async listRoles(tenantId: string) {
+    return prisma.role.findMany({
+      where: { tenantId },
+      orderBy: { level: 'desc' },
+    });
+  }
+
+  /**
+   * Get tenant subscription / billing info
+   */
+  async getSubscription(tenantId: string) {
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: tenantId },
+      include: {
+        plan: true,
+        modules: { include: { module: true }, where: { isActive: true } },
+        _count: { select: { users: true, products: true } },
+      },
+    });
+
+    if (!tenant) throw new NotFoundException('Entreprise introuvable');
+
+    return {
+      plan: tenant.plan,
+      status: tenant.status,
+      trialEndsAt: tenant.trialEndsAt,
+      activeModules: tenant.modules.map((tm) => ({
+        code: tm.module.code,
+        name: tm.module.name,
+        activatedAt: tm.activatedAt,
+      })),
+      usage: {
+        users: tenant._count.users,
+        maxUsers: tenant.plan.maxUsers,
+        products: tenant._count.products,
+        maxProducts: tenant.plan.maxProducts,
+      },
+    };
+  }
+
+  /**
+   * Upgrade plan
+   */
+  async upgradePlan(tenantId: string, planCode: string) {
+    const plan = await prisma.plan.findUnique({ where: { code: planCode } });
+    if (!plan) throw new BadRequestException('Plan invalide');
+
+    const tenant = await prisma.tenant.update({
+      where: { id: tenantId },
+      data: { planId: plan.id },
+      include: { plan: true },
+    });
+
+    // Activate any new modules included in the plan
+    const planModules = await prisma.planModule.findMany({
+      where: { planId: plan.id, isIncluded: true },
+    });
+
+    for (const pm of planModules) {
+      await prisma.tenantModule.upsert({
+        where: { tenantId_moduleId: { tenantId, moduleId: pm.moduleId } },
+        create: { tenantId, moduleId: pm.moduleId, isActive: true },
+        update: { isActive: true },
+      });
+    }
+
+    return tenant;
+  }
+}
