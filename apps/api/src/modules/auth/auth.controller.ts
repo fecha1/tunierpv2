@@ -9,37 +9,37 @@ import { IsEmail, IsString, MinLength, IsOptional, IsIn } from 'class-validator'
 
 class LoginDto {
   @IsEmail({}, { message: 'Email invalide' })
-  email: string;
+  email!: string;
 
   @IsString()
   @MinLength(6, { message: 'Mot de passe: 6 caractères minimum' })
-  password: string;
+  password!: string;
 }
 
 class RegisterDto {
   @IsString()
-  tenantName: string;
+  tenantName!: string;
 
   @IsString()
   @IsIn(['retail', 'restaurant', 'cafe', 'bakery', 'pharmacy', 'clothing', 'electronics', 'grocery', 'beauty', 'auto_parts', 'building_materials', 'furniture', 'jewelry', 'optics', 'general'])
-  businessType: string;
+  businessType!: string;
 
   @IsString()
   @IsIn(['starter', 'business', 'professional', 'enterprise'])
-  planCode: string;
+  planCode!: string;
 
   @IsEmail({}, { message: 'Email invalide' })
-  email: string;
+  email!: string;
 
   @IsString()
   @MinLength(6, { message: 'Mot de passe: 6 caractères minimum' })
-  password: string;
+  password!: string;
 
   @IsString()
-  firstName: string;
+  firstName!: string;
 
   @IsString()
-  lastName: string;
+  lastName!: string;
 
   @IsOptional()
   @IsString()
@@ -48,7 +48,7 @@ class RegisterDto {
 
 class RefreshTokenDto {
   @IsString()
-  refreshToken: string;
+  refreshToken!: string;
 }
 
 // ── Controller ───────────────────────────────────────────

@@ -1,4 +1,5 @@
 import { prisma, withTenantScope } from '@tunierp/database';
+import type { DocumentCode, PurchaseType, PurchaseStatus } from '@tunierp/database';
 
 // ── Suppliers ──────────────────────────────────────────────
 
@@ -36,7 +37,7 @@ export async function updateSupplier(
 
 // ── Purchase Orders ────────────────────────────────────────
 
-async function generatePurchaseNumber(tenantId: string, docType: string): Promise<string> {
+async function generatePurchaseNumber(tenantId: string, docType: DocumentCode): Promise<string> {
   const year = new Date().getFullYear();
   const seq = await prisma.documentSequence.findFirst({
     where: { tenantId, docType, year },
@@ -60,7 +61,7 @@ export async function listPurchases(
   const scoped = withTenantScope(prisma, tenantId);
 
   const where: any = {};
-  if (filters?.type) where.type = filters.type;
+  if (filters?.type) where.purchaseType = filters.type;
   if (filters?.status) where.status = filters.status;
   if (filters?.supplierId) where.supplierId = filters.supplierId;
 
@@ -91,7 +92,7 @@ export async function createPurchaseOrder(
     notes?: string;
   },
 ) {
-  const number = await generatePurchaseNumber(tenantId, 'BC');
+  const purchaseNumber = await generatePurchaseNumber(tenantId, 'BC' as DocumentCode);
 
   let subtotal = 0;
   let totalTax = 0;
@@ -101,7 +102,7 @@ export async function createPurchaseOrder(
     subtotal += lineTotal;
     totalTax += tax;
     return {
-      productId: item.productId,
+      productId: item.productId || undefined,
       variantId: item.variantId,
       quantity: item.quantity,
       unitPrice: item.unitPrice,
@@ -114,8 +115,9 @@ export async function createPurchaseOrder(
   return prisma.purchase.create({
     data: {
       tenantId,
-      type: 'purchase_order',
-      number,
+      purchaseType: 'order' as PurchaseType,
+      purchaseNumber,
+      purchaseDate: new Date(),
       supplierId: data.supplierId,
       status: 'draft',
       subtotal,
@@ -123,7 +125,7 @@ export async function createPurchaseOrder(
       total: Math.round((subtotal + totalTax) * 1000) / 1000,
       notes: data.notes,
       items: {
-        create: purchaseItems.map((item) => ({ tenantId, ...item })),
+        create: purchaseItems.map((item) => ({ ...item })),
       },
     },
     include: { items: true, supplier: true },
@@ -153,12 +155,12 @@ export async function receivePurchaseOrder(
     await prisma.inventoryMovement.create({
       data: {
         tenantId,
-        productId: item.productId,
+        productId: item.productId!,
         variantId: item.variantId,
         warehouseId,
-        type: 'in',
+        movementType: 'in',
         quantity: item.quantity,
-        reason: `Réception BC ${purchase.number}`,
+        notes: `Réception BC ${purchase.purchaseNumber}`,
         referenceType: 'purchase',
         referenceId: purchase.id,
       },
@@ -166,19 +168,19 @@ export async function receivePurchaseOrder(
 
     // Update inventory
     const existing = await prisma.inventory.findFirst({
-      where: { tenantId, productId: item.productId, warehouseId, variantId: item.variantId },
+      where: { tenantId, productId: item.productId!, warehouseId, variantId: item.variantId },
     });
 
     if (existing) {
       await prisma.inventory.update({
         where: { id: existing.id },
-        data: { quantity: existing.quantity + item.quantity },
+        data: { quantity: existing.quantity.add(item.quantity) },
       });
     } else {
       await prisma.inventory.create({
         data: {
           tenantId,
-          productId: item.productId,
+          productId: item.productId!,
           variantId: item.variantId,
           warehouseId,
           quantity: item.quantity,
@@ -188,10 +190,9 @@ export async function receivePurchaseOrder(
   }
 
   // Update purchase status
-  const receiptNumber = await generatePurchaseNumber(tenantId, 'REC');
   return prisma.purchase.update({
     where: { id: purchaseId },
-    data: { status: 'received', receivedAt: new Date() },
+    data: { status: 'received' },
   });
 }
 
@@ -204,15 +205,15 @@ export async function getPurchaseStats(tenantId: string) {
 
   const [monthlyTotal, pendingOrders, supplierCount] = await Promise.all([
     scoped.purchase.aggregate({
-      where: { status: 'received', receivedAt: { gte: startOfMonth } },
+      where: { status: 'received', createdAt: { gte: startOfMonth } },
       _sum: { total: true },
     }),
-    scoped.purchase.count({ where: { status: { in: ['draft', 'confirmed', 'ordered'] } } }),
+    scoped.purchase.count({ where: { status: { in: ['draft', 'confirmed', 'sent'] } } }),
     scoped.supplier.count(),
   ]);
 
   return {
-    monthlyPurchases: monthlyTotal._sum.total || 0,
+    monthlyPurchases: Number(monthlyTotal._sum?.total ?? 0),
     pendingOrders,
     supplierCount,
   };

@@ -10,8 +10,8 @@ export class TenantsService {
     const tenant = await prisma.tenant.findUnique({
       where: { id: tenantId },
       include: {
-        plan: { select: { id: true, name: true, code: true, maxUsers: true, maxProducts: true } },
-        _count: { select: { users: true, modules: true } },
+        plan: { select: { id: true, name: true, code: true, limits: true, features: true } },
+        _count: { select: { users: true, tenantModules: true } },
       },
     });
 
@@ -29,10 +29,6 @@ export class TenantsService {
     name?: string;
     logoUrl?: string;
     settings?: Record<string, any>;
-    phone?: string;
-    taxId?: string;
-    address?: string;
-    city?: string;
     country?: string;
   }) {
     const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
@@ -45,10 +41,6 @@ export class TenantsService {
       data: {
         ...(data.name && { name: data.name }),
         ...(data.logoUrl !== undefined && { logoUrl: data.logoUrl }),
-        ...(data.phone !== undefined && { phone: data.phone }),
-        ...(data.taxId !== undefined && { taxId: data.taxId }),
-        ...(data.address !== undefined && { address: data.address }),
-        ...(data.city !== undefined && { city: data.city }),
         ...(data.country !== undefined && { country: data.country }),
         ...(data.settings && {
           settings: { ...(tenant.settings as Record<string, any>), ...data.settings },
@@ -87,9 +79,10 @@ export class TenantsService {
 
     if (!tenant) throw new NotFoundException('Entreprise introuvable');
 
-    if (tenant.plan.maxUsers > 0 && tenant._count.users >= tenant.plan.maxUsers) {
+    const maxUsers = (tenant.plan?.limits as any)?.users ?? 0;
+    if (maxUsers > 0 && tenant._count.users >= maxUsers) {
       throw new BadRequestException(
-        `Limite d'utilisateurs atteinte (${tenant.plan.maxUsers}). Passez à un plan supérieur.`,
+        `Limite d'utilisateurs atteinte (${maxUsers}). Passez à un plan supérieur.`,
       );
     }
 
@@ -125,27 +118,28 @@ export class TenantsService {
       where: { id: tenantId },
       include: {
         plan: true,
-        modules: { include: { module: true }, where: { isActive: true } },
+        tenantModules: { include: { module: true }, where: { isActive: true } },
         _count: { select: { users: true, products: true } },
       },
     });
 
     if (!tenant) throw new NotFoundException('Entreprise introuvable');
 
+    const limits = (tenant.plan?.limits as any) ?? {};
+
     return {
       plan: tenant.plan,
       status: tenant.status,
-      trialEndsAt: tenant.trialEndsAt,
-      activeModules: tenant.modules.map((tm) => ({
+      activeModules: tenant.tenantModules.map((tm: any) => ({
         code: tm.module.code,
         name: tm.module.name,
         activatedAt: tm.activatedAt,
       })),
       usage: {
         users: tenant._count.users,
-        maxUsers: tenant.plan.maxUsers,
+        maxUsers: limits.users ?? 0,
         products: tenant._count.products,
-        maxProducts: tenant.plan.maxProducts,
+        maxProducts: limits.products ?? 0,
       },
     };
   }

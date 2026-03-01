@@ -1,8 +1,9 @@
 import { prisma, withTenantScope } from '@tunierp/database';
+import type { DocumentCode, SaleType, SaleStatus, PaymentMethod } from '@tunierp/database';
 
 // ── Document Number Generator ─────────────────────────────
 
-async function generateDocNumber(tenantId: string, docType: string): Promise<string> {
+async function generateDocNumber(tenantId: string, docType: DocumentCode): Promise<string> {
   const year = new Date().getFullYear();
 
   const seq = await prisma.documentSequence.findFirst({
@@ -37,7 +38,7 @@ export async function listSales(
   const scoped = withTenantScope(prisma, tenantId);
 
   const where: any = {};
-  if (filters?.type) where.type = filters.type;
+  if (filters?.type) where.saleType = filters.type;
   if (filters?.status) where.status = filters.status;
   if (filters?.customerId) where.customerId = filters.customerId;
 
@@ -45,7 +46,7 @@ export async function listSales(
     scoped.sale.findMany({
       where,
       include: {
-        customer: { select: { id: true, name: true, email: true } },
+        customer: { select: { id: true, firstName: true, lastName: true, companyName: true, email: true } },
         items: { select: { id: true, productId: true, quantity: true, unitPrice: true, total: true, product: { select: { name: true } } } },
       },
       orderBy: { createdAt: 'desc' },
@@ -96,7 +97,16 @@ export async function createSale(
     userId: string;
   },
 ) {
-  // Map type to document code
+  // Map type to SaleType enum and document code
+  const typeToSaleType: Record<string, string> = {
+    quote: 'quote',
+    invoice: 'invoice',
+    delivery_note: 'delivery',
+    proforma: 'proforma',
+    credit_note: 'credit_note',
+    warranty: 'warranty',
+  };
+
   const typeToCode: Record<string, string> = {
     quote: 'DEV',
     invoice: 'FAC',
@@ -106,8 +116,9 @@ export async function createSale(
     warranty: 'GAR',
   };
 
+  const saleType = typeToSaleType[data.type] || 'invoice';
   const docCode = typeToCode[data.type] || 'FAC';
-  const docNumber = await generateDocNumber(tenantId, docCode);
+  const docNumber = await generateDocNumber(tenantId, docCode as DocumentCode);
 
   // Calculate totals
   let subtotal = 0;
@@ -125,28 +136,31 @@ export async function createSale(
       variantId: item.variantId,
       quantity: item.quantity,
       unitPrice: item.unitPrice,
-      discount: item.discount || 0,
+      discountPercent: item.discount || 0,
+      discountAmount: Math.round(discountAmount * 1000) / 1000,
       taxRate: item.taxRate || 19,
       taxAmount: Math.round(tax * 1000) / 1000,
       total: Math.round((taxableAmount + tax) * 1000) / 1000,
     };
   });
 
-  const stampDuty = 1; // 1 TND droit de timbre
-  const grandTotal = Math.round((subtotal + totalTax + stampDuty) * 1000) / 1000;
+  const timbreFiscal = 1; // 1 TND droit de timbre
+  const grandTotal = Math.round((subtotal + totalTax + timbreFiscal) * 1000) / 1000;
 
   const sale = await prisma.sale.create({
     data: {
       tenantId,
-      type: data.type as any,
-      number: docNumber,
+      saleType: saleType as SaleType,
+      saleNumber: docNumber,
+      saleDate: new Date(),
       customerId: data.customerId,
       status: 'draft',
       subtotal,
       taxAmount: totalTax,
-      stampDuty,
+      timbreFiscal,
       total: grandTotal,
       notes: data.notes,
+      createdBy: data.userId,
       items: {
         create: saleItems.map((item) => ({ tenantId, ...item })),
       },
@@ -179,34 +193,38 @@ export async function updateSaleStatus(
  */
 export async function convertQuoteToInvoice(tenantId: string, quoteId: string, userId: string) {
   const quote = await prisma.sale.findFirst({
-    where: { id: quoteId, tenantId, type: 'quote' },
+    where: { id: quoteId, tenantId, saleType: 'quote' },
     include: { items: true },
-  });
+  }) as any;
 
   if (!quote) throw new Error('Devis introuvable');
 
-  const invoiceNumber = await generateDocNumber(tenantId, 'FAC');
+  const invoiceNumber = await generateDocNumber(tenantId, 'FAC' as DocumentCode);
 
   const invoice = await prisma.sale.create({
     data: {
       tenantId,
-      type: 'invoice',
-      number: invoiceNumber,
+      saleType: 'invoice',
+      saleNumber: invoiceNumber,
+      saleDate: new Date(),
       customerId: quote.customerId,
       status: 'confirmed',
       subtotal: quote.subtotal,
       taxAmount: quote.taxAmount,
-      stampDuty: quote.stampDuty,
+      timbreFiscal: quote.timbreFiscal,
       total: quote.total,
-      notes: `Converti du devis ${quote.number}`,
+      convertedFrom: quoteId,
+      notes: `Converti du devis ${quote.saleNumber}`,
+      createdBy: userId,
       items: {
-        create: quote.items.map((item) => ({
+        create: quote.items.map((item: any) => ({
           tenantId,
           productId: item.productId,
           variantId: item.variantId,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
-          discount: item.discount,
+          discountPercent: item.discountPercent,
+          discountAmount: item.discountAmount,
           taxRate: item.taxRate,
           taxAmount: item.taxAmount,
           total: item.total,
@@ -235,13 +253,13 @@ export async function listPayments(
 
   const where: any = {};
   if (filters?.saleId) where.saleId = filters.saleId;
-  if (filters?.method) where.method = filters.method;
+  if (filters?.method) where.paymentMethod = filters.method;
 
   return scoped.payment.findMany({
     where,
     include: {
-      sale: { select: { number: true, type: true, total: true } },
-      customer: { select: { name: true } },
+      sale: { select: { saleNumber: true, saleType: true, total: true } },
+      customer: { select: { firstName: true, lastName: true, companyName: true } },
     },
     orderBy: { paymentDate: 'desc' },
     take: filters?.limit || 25,
@@ -259,17 +277,21 @@ export async function createPayment(
     notes?: string;
   },
 ) {
+  const paymentNumber = `PAY-${Date.now()}`;
+
   const payment = await prisma.payment.create({
     data: {
       tenantId,
       saleId: data.saleId,
       customerId: data.customerId,
       amount: data.amount,
-      method: data.method as any,
-      reference: data.reference,
+      paymentNumber,
+      paymentType: 'received',
+      paymentMethod: data.method as PaymentMethod,
+      paymentReference: data.reference,
+      paymentDate: new Date(),
       notes: data.notes,
       status: 'completed',
-      paymentDate: new Date(),
     },
   });
 
@@ -281,15 +303,18 @@ export async function createPayment(
       _sum: { amount: true },
     });
 
-    if ((totalPaid._sum.amount || 0) >= sale.total) {
+    const paidAmount = Number(totalPaid._sum?.amount ?? 0);
+    const saleTotal = Number(sale.total);
+
+    if (paidAmount >= saleTotal) {
       await prisma.sale.update({
         where: { id: data.saleId },
-        data: { status: 'paid', paidAt: new Date() },
+        data: { status: 'paid', amountPaid: paidAmount },
       });
     } else {
       await prisma.sale.update({
         where: { id: data.saleId },
-        data: { status: 'partial' as any },
+        data: { status: 'partial' as SaleStatus, amountPaid: paidAmount },
       });
     }
   }
@@ -311,21 +336,21 @@ export async function getInvoicingStats(tenantId: string) {
     totalInvoices,
   ] = await Promise.all([
     scoped.sale.aggregate({
-      where: { type: 'invoice', status: 'paid', paidAt: { gte: startOfMonth } },
+      where: { saleType: 'invoice', status: 'paid', createdAt: { gte: startOfMonth } },
       _sum: { total: true },
-    }),
+    }) as any,
     scoped.sale.aggregate({
-      where: { type: 'invoice', status: { in: ['confirmed', 'delivered'] } },
+      where: { saleType: 'invoice', status: { in: ['confirmed', 'delivered'] } },
       _sum: { total: true },
       _count: true,
-    }),
-    scoped.sale.count({ where: { type: 'quote', createdAt: { gte: startOfMonth } } }),
-    scoped.sale.count({ where: { type: 'invoice', createdAt: { gte: startOfMonth } } }),
+    }) as any,
+    scoped.sale.count({ where: { saleType: 'quote', createdAt: { gte: startOfMonth } } }),
+    scoped.sale.count({ where: { saleType: 'invoice', createdAt: { gte: startOfMonth } } }),
   ]);
 
   return {
-    monthlyRevenue: monthlyRevenue._sum.total || 0,
-    unpaidAmount: unpaidInvoices._sum.total || 0,
+    monthlyRevenue: Number(monthlyRevenue._sum?.total ?? 0),
+    unpaidAmount: Number(unpaidInvoices._sum?.total ?? 0),
     unpaidCount: unpaidInvoices._count || 0,
     monthlyQuotes: totalQuotes,
     monthlyInvoices: totalInvoices,

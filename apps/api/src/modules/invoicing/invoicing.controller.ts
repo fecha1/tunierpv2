@@ -18,38 +18,38 @@ import { Type } from 'class-transformer';
 // ── DTOs ─────────────────────────────────────────────────
 
 class SaleItemDto {
-  @IsString() productId: string;
+  @IsString() productId!: string;
   @IsOptional() @IsString() variantId?: string;
-  @IsNumber() @Min(1) quantity: number;
-  @IsNumber() @Min(0) unitPrice: number;
+  @IsNumber() @Min(1) quantity!: number;
+  @IsNumber() @Min(0) unitPrice!: number;
   @IsOptional() @IsNumber() discount?: number;
   @IsOptional() @IsNumber() taxRate?: number;
 }
 
 class CreateSaleDto {
   @IsIn(['quote', 'invoice', 'delivery_note', 'proforma', 'credit_note', 'warranty'])
-  type: 'quote' | 'invoice' | 'delivery_note' | 'proforma' | 'credit_note' | 'warranty';
+  type!: 'quote' | 'invoice' | 'delivery_note' | 'proforma' | 'credit_note' | 'warranty';
 
   @IsOptional() @IsString() customerId?: string;
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => SaleItemDto)
-  items: SaleItemDto[];
+  items!: SaleItemDto[];
 
   @IsOptional() @IsString() notes?: string;
 }
 
 class UpdateStatusDto {
   @IsIn(['draft', 'confirmed', 'delivered', 'paid', 'cancelled'])
-  status: string;
+  status!: string;
 }
 
 class CreatePaymentDto {
-  @IsString() saleId: string;
+  @IsString() saleId!: string;
   @IsOptional() @IsString() customerId?: string;
-  @IsNumber() @Min(0.01) amount: number;
-  @IsString() method: string;
+  @IsNumber() @Min(0.01) amount!: number;
+  @IsString() method!: string;
   @IsOptional() @IsString() reference?: string;
   @IsOptional() @IsString() notes?: string;
 }

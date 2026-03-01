@@ -16,20 +16,20 @@ import { IsString, IsNumber, IsOptional, IsIn, Min } from 'class-validator';
 // ── DTOs ─────────────────────────────────────────────────
 
 class CreateMovementDto {
-  @IsString() productId: string;
+  @IsString() productId!: string;
   @IsOptional() @IsString() variantId?: string;
-  @IsString() warehouseId: string;
+  @IsString() warehouseId!: string;
   @IsIn(['in', 'out', 'adjustment', 'transfer', 'return'])
-  type: 'in' | 'out' | 'adjustment' | 'transfer' | 'return';
-  @IsNumber() @Min(0.01) quantity: number;
+  type!: 'in' | 'out' | 'adjustment' | 'transfer' | 'return';
+  @IsNumber() @Min(0.01) quantity!: number;
   @IsOptional() @IsString() reason?: string;
   @IsOptional() @IsString() referenceType?: string;
   @IsOptional() @IsString() referenceId?: string;
 }
 
 class CreateWarehouseDto {
-  @IsString() name: string;
-  @IsString() code: string;
+  @IsString() name!: string;
+  @IsString() code!: string;
   @IsOptional() @IsString() address?: string;
   @IsOptional() isDefault?: boolean;
 }

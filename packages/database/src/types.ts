@@ -36,7 +36,7 @@ export type {
   WebsiteTemplate,
   WebsitePage,
   WebsiteSettings,
-} from '../generated/prisma/client';
+} from './generated/prisma/client';
 
 // Re-export enums
 export {
@@ -54,4 +54,4 @@ export {
   PurchaseStatus,
   PageType,
   DocumentCode,
-} from '../generated/prisma/client';
+} from './generated/prisma/client';

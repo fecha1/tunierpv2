@@ -17,7 +17,7 @@ import { Type } from 'class-transformer';
 // ── DTOs ─────────────────────────────────────────────────
 
 class CreateSupplierDto {
-  @IsString() name: string;
+  @IsString() name!: string;
   @IsOptional() @IsString() email?: string;
   @IsOptional() @IsString() phone?: string;
   @IsOptional() @IsString() address?: string;
@@ -26,26 +26,26 @@ class CreateSupplierDto {
 }
 
 class PurchaseItemDto {
-  @IsString() productId: string;
+  @IsString() productId!: string;
   @IsOptional() @IsString() variantId?: string;
-  @IsNumber() @Min(1) quantity: number;
-  @IsNumber() @Min(0) unitPrice: number;
+  @IsNumber() @Min(1) quantity!: number;
+  @IsNumber() @Min(0) unitPrice!: number;
   @IsOptional() @IsNumber() taxRate?: number;
 }
 
 class CreatePurchaseDto {
-  @IsString() supplierId: string;
+  @IsString() supplierId!: string;
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => PurchaseItemDto)
-  items: PurchaseItemDto[];
+  items!: PurchaseItemDto[];
 
   @IsOptional() @IsString() notes?: string;
 }
 
 class ReceivePurchaseDto {
-  @IsString() warehouseId: string;
+  @IsString() warehouseId!: string;
 }
 
 // ── Controller ───────────────────────────────────────────

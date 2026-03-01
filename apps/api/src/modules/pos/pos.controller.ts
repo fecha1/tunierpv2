@@ -13,11 +13,11 @@ import { Type } from 'class-transformer';
 // ── DTOs ─────────────────────────────────────────────────
 
 class POSItemDto {
-  @IsString() productId: string;
+  @IsString() productId!: string;
   @IsOptional() @IsString() variantId?: string;
-  @IsString() name: string;
-  @IsNumber() @Min(1) quantity: number;
-  @IsNumber() @Min(0) unitPrice: number;
+  @IsString() name!: string;
+  @IsNumber() @Min(1) quantity!: number;
+  @IsNumber() @Min(0) unitPrice!: number;
   @IsOptional() @IsNumber() discount?: number;
   @IsOptional() @IsNumber() taxRate?: number;
 }
@@ -26,12 +26,12 @@ class CreatePOSSaleDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => POSItemDto)
-  items: POSItemDto[];
+  items!: POSItemDto[];
 
   @IsOptional() @IsString() customerId?: string;
-  @IsString() paymentMethod: string;
-  @IsNumber() @Min(0) amountPaid: number;
-  @IsString() warehouseId: string;
+  @IsString() paymentMethod!: string;
+  @IsNumber() @Min(0) amountPaid!: number;
+  @IsString() warehouseId!: string;
 }
 
 // ── Controller ───────────────────────────────────────────

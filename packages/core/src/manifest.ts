@@ -11,7 +11,7 @@ export interface ModuleManifest {
   name: string;
 
   /** Module category for grouping in sidebar */
-  category: 'core' | 'sales' | 'inventory' | 'purchasing' | 'finance' | 'hr' | 'analytics' | 'website' | 'marketing' | 'advanced';
+  category: 'core' | 'sales' | 'inventory' | 'purchasing' | 'finance' | 'hr' | 'analytics' | 'website' | 'marketing' | 'advanced' | 'ventes' | 'stock' | 'achats';
 
   /** Tabler icon name for sidebar */
   icon: string;

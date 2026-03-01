@@ -20,22 +20,22 @@ class UpdateTenantDto {
 
 class CreateUserDto {
   @IsEmail({}, { message: 'Email invalide' })
-  email: string;
+  email!: string;
 
   @IsString()
   @MinLength(6, { message: 'Mot de passe: 6 caractères minimum' })
-  password: string;
+  password!: string;
 
-  @IsString() firstName: string;
-  @IsString() lastName: string;
-  @IsString() roleId: string;
+  @IsString() firstName!: string;
+  @IsString() lastName!: string;
+  @IsString() roleId!: string;
   @IsOptional() @IsString() phone?: string;
 }
 
 class UpgradePlanDto {
   @IsString()
   @IsIn(['starter', 'business', 'professional', 'enterprise'])
-  planCode: string;
+  planCode!: string;
 }
 
 // ── Controller ───────────────────────────────────────────

@@ -42,7 +42,7 @@ export async function getActiveTenantModuleCodes(tenantId: string): Promise<stri
     where: { tenantId, isActive: true },
     select: { module: { select: { code: true } } },
   });
-  return tenantModules.map((tm) => tm.module.code);
+  return tenantModules.map((tm: any) => tm.module.code);
 }
 
 /**

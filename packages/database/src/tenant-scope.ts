@@ -25,7 +25,7 @@ export function withTenantScope(prisma: PrismaClientType, tenantId: string) {
   return prisma.$extends({
     name: 'tenantScope',
     query: {
-      $allOperations({ model, operation, args, query }) {
+      $allOperations({ model, operation, args, query }: { model?: string; operation: string; args: any; query: (args: any) => any }) {
         if (!model || !TENANT_SCOPED_MODELS.has(model)) {
           return query(args);
         }

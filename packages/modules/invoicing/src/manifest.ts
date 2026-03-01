@@ -12,13 +12,13 @@ export const invoicingManifest: ModuleManifest = {
   frontendPrefix: '/invoicing',
 
   permissions: [
-    { code: 'sales.read', name: 'Voir les ventes', description: 'Consulter les devis et factures' },
-    { code: 'sales.create', name: 'Créer une vente', description: 'Créer devis, factures, bons de livraison' },
-    { code: 'sales.update', name: 'Modifier une vente', description: 'Modifier les documents de vente' },
-    { code: 'sales.delete', name: 'Supprimer une vente', description: 'Annuler ou supprimer un document' },
-    { code: 'sales.validate', name: 'Valider une facture', description: 'Passer une facture en validé/payé' },
-    { code: 'payments.create', name: 'Enregistrer un paiement', description: 'Recevoir un paiement client' },
-    { code: 'payments.read', name: 'Voir les paiements', description: 'Consulter les paiements reçus' },
+    { key: 'sales.read', label: 'Voir les ventes', description: 'Consulter les devis et factures' },
+    { key: 'sales.create', label: 'Créer une vente', description: 'Créer devis, factures, bons de livraison' },
+    { key: 'sales.update', label: 'Modifier une vente', description: 'Modifier les documents de vente' },
+    { key: 'sales.delete', label: 'Supprimer une vente', description: 'Annuler ou supprimer un document' },
+    { key: 'sales.validate', label: 'Valider une facture', description: 'Passer une facture en validé/payé' },
+    { key: 'payments.create', label: 'Enregistrer un paiement', description: 'Recevoir un paiement client' },
+    { key: 'payments.read', label: 'Voir les paiements', description: 'Consulter les paiements reçus' },
   ],
 
   sidebarItems: [
@@ -72,12 +72,12 @@ export const invoicingManifest: ModuleManifest = {
     },
   ],
 
-  settingsSchema: [
-    { key: 'defaultTaxRate', type: 'number', label: 'Taux TVA par défaut (%)', default: 19, description: 'TVA appliquée par défaut (19% en Tunisie)' },
-    { key: 'quoteValidityDays', type: 'number', label: 'Validité devis (jours)', default: 30, description: 'Nombre de jours de validité des devis' },
-    { key: 'paymentTermDays', type: 'number', label: 'Échéance paiement (jours)', default: 30, description: 'Délai de paiement par défaut' },
-    { key: 'stampDuty', type: 'number', label: 'Timbre fiscal (TND)', default: 1, description: 'Droit de timbre sur les factures' },
-    { key: 'showDiscount', type: 'boolean', label: 'Afficher les remises', default: true, description: 'Colonne remise sur les documents' },
-    { key: 'autoNumbering', type: 'boolean', label: 'Numérotation automatique', default: true, description: 'Numérotation séquentielle des documents' },
-  ],
+  settingsSchema: {
+    defaultTaxRate: { type: 'number', label: 'Taux TVA par défaut (%)', default: 19, description: 'TVA appliquée par défaut (19% en Tunisie)' },
+    quoteValidityDays: { type: 'number', label: 'Validité devis (jours)', default: 30, description: 'Nombre de jours de validité des devis' },
+    paymentTermDays: { type: 'number', label: 'Échéance paiement (jours)', default: 30, description: 'Délai de paiement par défaut' },
+    stampDuty: { type: 'number', label: 'Timbre fiscal (TND)', default: 1, description: 'Droit de timbre sur les factures' },
+    showDiscount: { type: 'boolean', label: 'Afficher les remises', default: true, description: 'Colonne remise sur les documents' },
+    autoNumbering: { type: 'boolean', label: 'Numérotation automatique', default: true, description: 'Numérotation séquentielle des documents' },
+  },
 };

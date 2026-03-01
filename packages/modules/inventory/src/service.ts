@@ -18,7 +18,7 @@ export async function getStockLevels(
   const inventory = await scoped.inventory.findMany({
     where,
     include: {
-      product: { select: { id: true, name: true, sku: true, barcode: true, minStock: true, category: { select: { name: true } } } },
+      product: { select: { id: true, name: true, sku: true, barcode: true, category: { select: { name: true } } } },
       warehouse: { select: { id: true, name: true, code: true } },
       variant: { select: { id: true, name: true, sku: true } },
     },
@@ -54,7 +54,7 @@ export async function getMovements(
 
   const where: any = {};
   if (filters?.warehouseId) where.warehouseId = filters.warehouseId;
-  if (filters?.type) where.type = filters.type;
+  if (filters?.type) where.movementType = filters.type;
   if (filters?.startDate || filters?.endDate) {
     where.createdAt = {};
     if (filters?.startDate) where.createdAt.gte = filters.startDate;
@@ -81,7 +81,7 @@ export async function createMovement(
     productId: string;
     variantId?: string;
     warehouseId: string;
-    type: 'in' | 'out' | 'adjustment' | 'transfer' | 'return';
+    type: 'in' | 'out' | 'adjustment' | 'transfer';
     quantity: number;
     reason?: string;
     referenceType?: string;
@@ -98,9 +98,9 @@ export async function createMovement(
       productId: data.productId,
       variantId: data.variantId,
       warehouseId: data.warehouseId,
-      type: data.type as any,
+      movementType: data.type as any,
       quantity: data.quantity,
-      reason: data.reason,
+      notes: data.reason,
       referenceType: data.referenceType as any,
       referenceId: data.referenceId,
     },
@@ -117,12 +117,12 @@ export async function createMovement(
   });
 
   const quantityDelta =
-    data.type === 'in' || data.type === 'return' ? data.quantity : -data.quantity;
+    data.type === 'in' ? data.quantity : -data.quantity;
 
   if (inventoryRecord) {
     await prisma.inventory.update({
       where: { id: inventoryRecord.id },
-      data: { quantity: inventoryRecord.quantity + quantityDelta },
+      data: { quantity: inventoryRecord.quantity.add(quantityDelta) },
     });
   } else {
     await prisma.inventory.create({

@@ -30,7 +30,7 @@ export class RegistryService {
    */
   async listModuleCatalog() {
     return prisma.module.findMany({
-      orderBy: { sortOrder: 'asc' },
+      orderBy: { name: 'asc' },
       select: {
         id: true,
         code: true,
@@ -39,8 +39,7 @@ export class RegistryService {
         category: true,
         icon: true,
         isCore: true,
-        monthlyPrice: true,
-        yearlyPrice: true,
+        priceMonthly: true,
         isActive: true,
       },
     });
@@ -59,7 +58,7 @@ export class RegistryService {
       },
     });
 
-    return tenantModules.map((tm) => ({
+    return tenantModules.map((tm: any) => ({
       ...tm.module,
       activatedAt: tm.activatedAt,
     }));
@@ -93,7 +92,7 @@ export class RegistryService {
 
     // Check dependencies from registry
     const depCheck = await checkModuleDependencies(tenantId, moduleCode);
-    if (!depCheck.satisfied) {
+    if (!depCheck.met) {
       throw new BadRequestException(
         `Dépendances manquantes: ${depCheck.missing.join(', ')}. Activez-les d'abord.`,
       );
@@ -102,23 +101,23 @@ export class RegistryService {
     // Check plan allows this module
     const tenant = await prisma.tenant.findUnique({
       where: { id: tenantId },
-      include: { plan: { include: { modules: { include: { module: true } } } } },
+      include: { plan: { include: { planModules: { include: { module: true } } } } },
     });
 
     if (!tenant) throw new NotFoundException('Entreprise introuvable');
 
-    const planModule = tenant.plan.modules.find((pm) => pm.module.code === moduleCode);
+    const planModule = tenant.plan?.planModules.find((pm: any) => pm.module.code === moduleCode);
     if (!planModule) {
       throw new BadRequestException(
-        `Le module "${mod.name}" n'est pas disponible dans votre plan "${tenant.plan.name}". Passez à un plan supérieur.`,
+        `Le module "${mod.name}" n'est pas disponible dans votre plan "${tenant.plan?.name}". Passez à un plan supérieur.`,
       );
     }
 
     // Upsert
     if (existing) {
       await prisma.tenantModule.update({
-        where: { id: existing.id },
-        data: { isActive: true, activatedAt: new Date(), deactivatedAt: null },
+        where: { tenantId_moduleId: { tenantId, moduleId: mod.id } },
+        data: { isActive: true, activatedAt: new Date() },
       });
     } else {
       await prisma.tenantModule.create({
@@ -164,8 +163,8 @@ export class RegistryService {
     }
 
     await prisma.tenantModule.update({
-      where: { id: tenantModule.id },
-      data: { isActive: false, deactivatedAt: new Date() },
+      where: { tenantId_moduleId: { tenantId, moduleId: mod.id } },
+      data: { isActive: false },
     });
 
     return { success: true, message: `Module "${mod.name}" désactivé` };

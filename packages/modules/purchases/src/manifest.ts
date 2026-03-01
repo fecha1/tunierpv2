@@ -12,12 +12,12 @@ export const purchasesManifest: ModuleManifest = {
   frontendPrefix: '/purchases',
 
   permissions: [
-    { code: 'purchases.read', name: 'Voir les achats', description: 'Consulter les bons de commande et réceptions' },
-    { code: 'purchases.create', name: 'Créer un achat', description: 'Créer un bon de commande fournisseur' },
-    { code: 'purchases.update', name: 'Modifier un achat', description: 'Modifier les documents d\'achat' },
-    { code: 'purchases.delete', name: 'Supprimer un achat', description: 'Annuler un bon de commande' },
-    { code: 'purchases.validate', name: 'Valider un achat', description: 'Confirmer et réceptionner' },
-    { code: 'purchases.suppliers.manage', name: 'Gérer les fournisseurs', description: 'CRUD fournisseurs' },
+    { key: 'purchases.read', label: 'Voir les achats', description: 'Consulter les bons de commande et réceptions' },
+    { key: 'purchases.create', label: 'Créer un achat', description: 'Créer un bon de commande fournisseur' },
+    { key: 'purchases.update', label: 'Modifier un achat', description: 'Modifier les documents d\'achat' },
+    { key: 'purchases.delete', label: 'Supprimer un achat', description: 'Annuler un bon de commande' },
+    { key: 'purchases.validate', label: 'Valider un achat', description: 'Confirmer et réceptionner' },
+    { key: 'purchases.suppliers.manage', label: 'Gérer les fournisseurs', description: 'CRUD fournisseurs' },
   ],
 
   sidebarItems: [
@@ -55,9 +55,9 @@ export const purchasesManifest: ModuleManifest = {
     },
   ],
 
-  settingsSchema: [
-    { key: 'defaultPaymentTermDays', type: 'number', label: 'Échéance paiement fournisseur (jours)', default: 30, description: 'Délai de paiement fournisseur par défaut' },
-    { key: 'autoReceiveStock', type: 'boolean', label: 'Réception auto en stock', default: true, description: 'Entrée automatique en stock à la réception' },
-    { key: 'requireApproval', type: 'boolean', label: 'Validation requise', default: false, description: 'Les BC doivent être approuvés avant envoi' },
-  ],
+  settingsSchema: {
+    defaultPaymentTermDays: { type: 'number', label: 'Échéance paiement fournisseur (jours)', default: 30, description: 'Délai de paiement fournisseur par défaut' },
+    autoReceiveStock: { type: 'boolean', label: 'Réception auto en stock', default: true, description: 'Entrée automatique en stock à la réception' },
+    requireApproval: { type: 'boolean', label: 'Validation requise', default: false, description: 'Les BC doivent être approuvés avant envoi' },
+  },
 };

@@ -1,4 +1,5 @@
 import { prisma, withTenantScope } from '@tunierp/database';
+import type { SaleType, PaymentMethod } from '@tunierp/database';
 
 // ── POS Session ────────────────────────────────────────────
 
@@ -14,7 +15,7 @@ export async function openSession(
   const existing = await prisma.sale.findFirst({
     where: {
       tenantId,
-      type: 'pos_ticket',
+      saleType: 'receipt',
       // We'll track sessions via a separate approach — using metadata on sales
     },
   });
@@ -88,7 +89,8 @@ export async function createPOSSale(
       variantId: item.variantId,
       quantity: item.quantity,
       unitPrice: item.unitPrice,
-      discount: item.discount || 0,
+      discountPercent: item.discount || 0,
+      discountAmount: Math.round(discountAmt * 1000) / 1000,
       taxRate: item.taxRate || 19,
       taxAmount: Math.round(tax * 1000) / 1000,
       total: Math.round((taxable + tax) * 1000) / 1000,
@@ -103,17 +105,19 @@ export async function createPOSSale(
   const sale = await prisma.sale.create({
     data: {
       tenantId,
-      type: 'pos_ticket',
-      number: ticketNumber,
+      saleType: 'receipt' as SaleType,
+      saleNumber: ticketNumber,
+      saleDate: new Date(),
       customerId: data.customerId,
       status: 'paid',
       subtotal,
       taxAmount: totalTax,
-      stampDuty,
+      timbreFiscal: 0,
       total: grandTotal,
-      paidAt: new Date(),
+      amountPaid: grandTotal,
+      createdBy: data.userId,
       items: {
-        create: saleItems.map((item) => ({ tenantId, ...item })),
+        create: saleItems.map((item) => ({ ...item })),
       },
     },
     include: { items: true },
@@ -126,9 +130,11 @@ export async function createPOSSale(
       saleId: sale.id,
       customerId: data.customerId,
       amount: grandTotal,
-      method: data.paymentMethod as any,
-      status: 'completed',
+      paymentNumber: `PAY-${Date.now()}`,
+      paymentType: 'received',
+      paymentMethod: data.paymentMethod as PaymentMethod,
       paymentDate: new Date(),
+      status: 'completed',
     },
   });
 
@@ -140,9 +146,9 @@ export async function createPOSSale(
         productId: item.productId,
         variantId: item.variantId,
         warehouseId: data.warehouseId,
-        type: 'out',
+        movementType: 'out',
         quantity: item.quantity,
-        reason: `Vente POS ${ticketNumber}`,
+        notes: `Vente POS ${ticketNumber}`,
         referenceType: 'sale',
         referenceId: sale.id,
       },
@@ -153,9 +159,10 @@ export async function createPOSSale(
     });
 
     if (inv) {
+      const newQty = Number(inv.quantity) - item.quantity;
       await prisma.inventory.update({
         where: { id: inv.id },
-        data: { quantity: Math.max(0, inv.quantity - item.quantity) },
+        data: { quantity: Math.max(0, newQty) },
       });
     }
   }
@@ -217,27 +224,29 @@ export async function getPOSStats(tenantId: string, userId?: string) {
   startOfDay.setHours(0, 0, 0, 0);
 
   const where: any = {
-    type: 'pos_ticket',
+    saleType: 'receipt',
     createdAt: { gte: startOfDay },
   };
 
   const [ticketCount, totalSales, cashTotal] = await Promise.all([
     scoped.sale.count({ where }),
-    scoped.sale.aggregate({ where, _sum: { total: true } }),
+    scoped.sale.aggregate({ where, _sum: { total: true } }) as any,
     scoped.payment.aggregate({
       where: {
         paymentDate: { gte: startOfDay },
-        method: 'cash',
-        sale: { type: 'pos_ticket' },
+        paymentMethod: 'cash',
+        sale: { saleType: 'receipt' },
       },
       _sum: { amount: true },
-    }),
+    }) as any,
   ]);
+
+  const totalAmount = Number(totalSales._sum?.total ?? 0);
 
   return {
     ticketCount,
-    totalSales: totalSales._sum.total || 0,
-    cashTotal: cashTotal._sum.amount || 0,
-    averageTicket: ticketCount > 0 ? (totalSales._sum.total || 0) / ticketCount : 0,
+    totalSales: totalAmount,
+    cashTotal: Number(cashTotal._sum?.amount ?? 0),
+    averageTicket: ticketCount > 0 ? totalAmount / ticketCount : 0,
   };
 }

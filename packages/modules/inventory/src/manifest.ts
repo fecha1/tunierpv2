@@ -12,12 +12,12 @@ export const inventoryManifest: ModuleManifest = {
   frontendPrefix: '/inventory',
 
   permissions: [
-    { code: 'inventory.read', name: 'Voir le stock', description: 'Consulter les niveaux de stock' },
-    { code: 'inventory.create', name: 'Entrée de stock', description: 'Ajouter du stock (réception, retour)' },
-    { code: 'inventory.update', name: 'Modifier le stock', description: 'Ajustements de stock' },
-    { code: 'inventory.delete', name: 'Supprimer un mouvement', description: 'Annuler un mouvement de stock' },
-    { code: 'inventory.transfer', name: 'Transfert inter-entrepôt', description: 'Transférer du stock entre entrepôts' },
-    { code: 'inventory.warehouses.manage', name: 'Gérer les entrepôts', description: 'Créer et modifier des entrepôts' },
+    { key: 'inventory.read', label: 'Voir le stock', description: 'Consulter les niveaux de stock' },
+    { key: 'inventory.create', label: 'Entrée de stock', description: 'Ajouter du stock (réception, retour)' },
+    { key: 'inventory.update', label: 'Modifier le stock', description: 'Ajustements de stock' },
+    { key: 'inventory.delete', label: 'Supprimer un mouvement', description: 'Annuler un mouvement de stock' },
+    { key: 'inventory.transfer', label: 'Transfert inter-entrepôt', description: 'Transférer du stock entre entrepôts' },
+    { key: 'inventory.warehouses.manage', label: 'Gérer les entrepôts', description: 'Créer et modifier des entrepôts' },
   ],
 
   sidebarItems: [
@@ -55,9 +55,9 @@ export const inventoryManifest: ModuleManifest = {
     },
   ],
 
-  settingsSchema: [
-    { key: 'lowStockThreshold', type: 'number', label: 'Seuil stock faible', default: 10, description: 'Alerte quand le stock passe en dessous' },
-    { key: 'autoReorderEnabled', type: 'boolean', label: 'Réapprovisionnement auto', default: false, description: 'Créer automatiquement des bons de commande' },
-    { key: 'trackExpiryDates', type: 'boolean', label: 'Suivi des dates d\'expiration', default: false, description: 'Pour les produits périssables' },
-  ],
+  settingsSchema: {
+    lowStockThreshold: { type: 'number', label: 'Seuil stock faible', default: 10, description: 'Alerte quand le stock passe en dessous' },
+    autoReorderEnabled: { type: 'boolean', label: 'Réapprovisionnement auto', default: false, description: 'Créer automatiquement des bons de commande' },
+    trackExpiryDates: { type: 'boolean', label: 'Suivi des dates d\'expiration', default: false, description: 'Pour les produits périssables' },
+  },
 };
