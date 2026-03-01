@@ -1,6 +1,15 @@
 // ============================================================
 // TuniERP API — Entry Point
 // ============================================================
+// Load .env BEFORE any other import so DATABASE_URL is available
+// when @tunierp/database creates the PrismaClient singleton.
+import { config } from 'dotenv';
+import { resolve } from 'path';
+config({ path: resolve(process.cwd(), '.env') });
+config({ path: resolve(process.cwd(), '..', '..', 'packages', 'database', '.env') });
+
+console.log('[boot] DATABASE_URL loaded:', process.env.DATABASE_URL ? 'YES' : 'NO');
+
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -16,13 +25,18 @@ async function bootstrap() {
   // Global prefix
   app.setGlobalPrefix('api/v1');
 
-  // CORS
+  // CORS — supports both local dev and Docker container networking
+  const corsOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',')
+    : [
+        'http://localhost:4050',  // web (marketing)
+        'http://localhost:4052',  // dashboard
+        'http://localhost:3000',  // fallback
+        'http://front:4050',      // Docker: front container
+        'http://dashboard:4052',  // Docker: dashboard container
+      ];
   app.enableCors({
-    origin: [
-      'http://localhost:4050',  // web (marketing)
-      'http://localhost:4052',  // dashboard
-      'http://localhost:3000',  // fallback
-    ],
+    origin: corsOrigins,
     credentials: true,
   });
 

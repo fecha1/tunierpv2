@@ -19,8 +19,8 @@ class CreateMovementDto {
   @IsString() productId!: string;
   @IsOptional() @IsString() variantId?: string;
   @IsString() warehouseId!: string;
-  @IsIn(['in', 'out', 'adjustment', 'transfer', 'return'])
-  type!: 'in' | 'out' | 'adjustment' | 'transfer' | 'return';
+  @IsIn(['in', 'out', 'adjustment', 'transfer'])
+  type!: 'in' | 'out' | 'adjustment' | 'transfer';
   @IsNumber() @Min(0.01) quantity!: number;
   @IsOptional() @IsString() reason?: string;
   @IsOptional() @IsString() referenceType?: string;

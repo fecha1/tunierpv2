@@ -1,18 +1,17 @@
 // ============================================================
-// @tunierp/database — Prisma Client singleton with Accelerate
+// @tunierp/database — Prisma Client singleton
 // ============================================================
-import { PrismaClient } from './generated/prisma/client';
-import { withAccelerate } from '@prisma/extension-accelerate';
+import { PrismaClient } from './generated/prisma';
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: ReturnType<typeof createPrismaClient> | undefined;
+  prisma: PrismaClient | undefined;
 };
 
 function createPrismaClient() {
   return new PrismaClient({
     datasourceUrl: process.env.DATABASE_URL,
     log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
-  }).$extends(withAccelerate());
+  });
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();

@@ -10,7 +10,8 @@
     "moduleResolution": "node",
     "declaration": false,
     "declarationMap": false,
-    "composite": false
+    "composite": false,
+    "incremental": false
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]

@@ -1,12 +1,12 @@
 // prisma/seed.ts — Seeds default Plans, Modules, system Roles & demo Tenant
 // Run: pnpm db:seed
 import 'dotenv/config';
-import { PrismaClient } from '../src/generated/prisma/client';
-import { withAccelerate } from '@prisma/extension-accelerate';
+import { PrismaClient } from '../src/generated/prisma';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient({
   datasourceUrl: process.env.DATABASE_URL,
-}).$extends(withAccelerate());
+});
 
 // ── PLANS ────────────────────────────────────────────────
 const plans = [
@@ -171,8 +171,7 @@ async function main() {
   console.log(`  ✅  ${defaultRoles.length} default roles for demo tenant`);
 
   // 8. Create demo admin user (password: "demo1234")
-  // bcrypt hash of "demo1234"
-  const demoPasswordHash = '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36r6Q7EwqZ5YqFHU36VKOGy';
+  const demoPasswordHash = await bcrypt.hash('demo1234', 10);
   const adminRole = await prisma.role.findUnique({
     where: { tenantId_code: { tenantId: demoTenant.id, code: 'tenant_admin' } },
   });

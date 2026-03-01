@@ -23,7 +23,7 @@ const config: runtime.GetPrismaClientConfig = {
       "value": "prisma-client"
     },
     "output": {
-      "value": "C:\\Users\\lapte\\OneDrive\\Bureau\\tunierpv2\\packages\\database\\src\\generated\\prisma",
+      "value": "C:\\Users\\Talel Brini\\Documents\\GitHub\\tunierpv2\\packages\\database\\src\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -37,7 +37,7 @@ const config: runtime.GetPrismaClientConfig = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\lapte\\OneDrive\\Bureau\\tunierpv2\\packages\\database\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\Talel Brini\\Documents\\GitHub\\tunierpv2\\packages\\database\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativePath": "../../../prisma",

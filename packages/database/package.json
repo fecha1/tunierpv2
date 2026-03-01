@@ -18,8 +18,7 @@
     "clean": "rm -rf dist node_modules"
   },
   "dependencies": {
-    "@prisma/client": "^7.4.0",
-    "@prisma/extension-accelerate": "^3.0.1"
+    "@prisma/client": "^6.19.2"
   },
   "devDependencies": {
     "dotenv": "^16.5.0",

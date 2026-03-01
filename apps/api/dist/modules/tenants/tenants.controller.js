@@ -1,152 +1,161 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
+Object.defineProperty(exports, "__esModule", {
+    value: true
 });
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+Object.defineProperty(exports, "TenantsController", {
+    enumerable: true,
+    get: function() {
+        return TenantsController;
+    }
+});
+const _common = require("@nestjs/common");
+const _tenantsservice = require("./tenants.service");
+const _jwtauthguard = require("../../shared/guards/jwt-auth.guard");
+const _decorators = require("../../shared/decorators");
+const _classvalidator = require("class-validator");
+function _getRequireWildcardCache(nodeInterop) {
+    if (typeof WeakMap !== "function") return null;
+    var cacheBabelInterop = new WeakMap();
+    var cacheNodeInterop = new WeakMap();
+    return (_getRequireWildcardCache = function(nodeInterop) {
+        return nodeInterop ? cacheNodeInterop : cacheBabelInterop;
+    })(nodeInterop);
+}
+function _interop_require_wildcard(obj, nodeInterop) {
+    if (!nodeInterop && obj && obj.__esModule) {
+        return obj;
+    }
+    if (obj === null || typeof obj !== "object" && typeof obj !== "function") {
+        return {
+            default: obj
+        };
+    }
+    var cache = _getRequireWildcardCache(nodeInterop);
+    if (cache && cache.has(obj)) {
+        return cache.get(obj);
+    }
+    var newObj = {
+        __proto__: null
+    };
+    var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor;
+    for(var key in obj){
+        if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) {
+            var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null;
+            if (desc && (desc.get || desc.set)) {
+                Object.defineProperty(newObj, key, desc);
+            } else {
+                newObj[key] = obj[key];
+            }
+        }
+    }
+    newObj.default = obj;
+    if (cache) {
+        cache.set(obj, newObj);
+    }
+    return newObj;
+}
+function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    else for(var i = decorators.length - 1; i >= 0; i--)if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-var __metadata = (this && this.__metadata) || function (k, v) {
+}
+function _ts_metadata(k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TenantsController = void 0;
-const common_1 = require("@nestjs/common");
-const tenants_service_1 = require("./tenants.service");
-const jwt_auth_guard_1 = require("../../shared/guards/jwt-auth.guard");
-const decorators_1 = require("../../shared/decorators");
-const class_validator_1 = require("class-validator");
+}
+function _ts_param(paramIndex, decorator) {
+    return function(target, key) {
+        decorator(target, key, paramIndex);
+    };
+}
 // ── DTOs ─────────────────────────────────────────────────
-class UpdateTenantDto {
-    name;
-    logoUrl;
-    phone;
-    taxId;
-    address;
-    city;
-    country;
-    settings;
-}
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+let UpdateTenantDto = class UpdateTenantDto {
+};
+_ts_decorate([
+    (0, _classvalidator.IsOptional)(),
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], UpdateTenantDto.prototype, "name", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsOptional)(),
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], UpdateTenantDto.prototype, "logoUrl", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsOptional)(),
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], UpdateTenantDto.prototype, "phone", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsOptional)(),
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], UpdateTenantDto.prototype, "taxId", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsOptional)(),
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], UpdateTenantDto.prototype, "address", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsOptional)(),
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], UpdateTenantDto.prototype, "city", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsOptional)(),
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], UpdateTenantDto.prototype, "country", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Object)
+_ts_decorate([
+    (0, _classvalidator.IsOptional)(),
+    _ts_metadata("design:type", typeof Record === "undefined" ? Object : Record)
 ], UpdateTenantDto.prototype, "settings", void 0);
-class CreateUserDto {
-    email;
-    password;
-    firstName;
-    lastName;
-    roleId;
-    phone;
-}
-__decorate([
-    (0, class_validator_1.IsEmail)({}, { message: 'Email invalide' }),
-    __metadata("design:type", String)
+let CreateUserDto = class CreateUserDto {
+};
+_ts_decorate([
+    (0, _classvalidator.IsEmail)({}, {
+        message: 'Email invalide'
+    }),
+    _ts_metadata("design:type", String)
 ], CreateUserDto.prototype, "email", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(6, { message: 'Mot de passe: 6 caractères minimum' }),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsString)(),
+    (0, _classvalidator.MinLength)(6, {
+        message: 'Mot de passe: 6 caractères minimum'
+    }),
+    _ts_metadata("design:type", String)
 ], CreateUserDto.prototype, "password", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], CreateUserDto.prototype, "firstName", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], CreateUserDto.prototype, "lastName", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], CreateUserDto.prototype, "roleId", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsOptional)(),
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], CreateUserDto.prototype, "phone", void 0);
-class UpgradePlanDto {
-    planCode;
-}
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsIn)(['starter', 'business', 'professional', 'enterprise']),
-    __metadata("design:type", String)
+let UpgradePlanDto = class UpgradePlanDto {
+};
+_ts_decorate([
+    (0, _classvalidator.IsString)(),
+    (0, _classvalidator.IsIn)([
+        'starter',
+        'business',
+        'professional',
+        'enterprise'
+    ]),
+    _ts_metadata("design:type", String)
 ], UpgradePlanDto.prototype, "planCode", void 0);
-// ── Controller ───────────────────────────────────────────
 let TenantsController = class TenantsController {
-    tenantsService;
-    constructor(tenantsService) {
+    constructor(tenantsService){
         this.tenantsService = tenantsService;
     }
     async getCurrentTenant(tenantId) {
@@ -159,7 +168,7 @@ let TenantsController = class TenantsController {
         return this.tenantsService.listUsers(tenantId);
     }
     async createUser(tenantId, dto) {
-        const { hashPassword } = await Promise.resolve().then(() => __importStar(require('@tunierp/auth')));
+        const { hashPassword } = await Promise.resolve().then(()=>/*#__PURE__*/ _interop_require_wildcard(require("@tunierp/auth")));
         const passwordHash = await hashPassword(dto.password);
         return this.tenantsService.createUser(tenantId, {
             email: dto.email,
@@ -167,7 +176,7 @@ let TenantsController = class TenantsController {
             firstName: dto.firstName,
             lastName: dto.lastName,
             roleId: dto.roleId,
-            phone: dto.phone,
+            phone: dto.phone
         });
     }
     async listRoles(tenantId) {
@@ -180,67 +189,87 @@ let TenantsController = class TenantsController {
         return this.tenantsService.upgradePlan(tenantId, dto.planCode);
     }
 };
-exports.TenantsController = TenantsController;
-__decorate([
-    (0, common_1.Get)('current'),
-    __param(0, (0, decorators_1.TenantId)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
+_ts_decorate([
+    (0, _common.Get)('current'),
+    _ts_param(0, (0, _decorators.TenantId)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String
+    ]),
+    _ts_metadata("design:returntype", Promise)
 ], TenantsController.prototype, "getCurrentTenant", null);
-__decorate([
-    (0, common_1.Patch)('current'),
-    (0, decorators_1.Permissions)('settings.update'),
-    __param(0, (0, decorators_1.TenantId)()),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, UpdateTenantDto]),
-    __metadata("design:returntype", Promise)
+_ts_decorate([
+    (0, _common.Patch)('current'),
+    (0, _decorators.Permissions)('settings.update'),
+    _ts_param(0, (0, _decorators.TenantId)()),
+    _ts_param(1, (0, _common.Body)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String,
+        typeof UpdateTenantDto === "undefined" ? Object : UpdateTenantDto
+    ]),
+    _ts_metadata("design:returntype", Promise)
 ], TenantsController.prototype, "updateCurrentTenant", null);
-__decorate([
-    (0, common_1.Get)('current/users'),
-    (0, decorators_1.Permissions)('settings.users.read'),
-    __param(0, (0, decorators_1.TenantId)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
+_ts_decorate([
+    (0, _common.Get)('current/users'),
+    (0, _decorators.Permissions)('settings.users.read'),
+    _ts_param(0, (0, _decorators.TenantId)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String
+    ]),
+    _ts_metadata("design:returntype", Promise)
 ], TenantsController.prototype, "listUsers", null);
-__decorate([
-    (0, common_1.Post)('current/users'),
-    (0, decorators_1.Permissions)('settings.users.create'),
-    __param(0, (0, decorators_1.TenantId)()),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, CreateUserDto]),
-    __metadata("design:returntype", Promise)
+_ts_decorate([
+    (0, _common.Post)('current/users'),
+    (0, _decorators.Permissions)('settings.users.create'),
+    _ts_param(0, (0, _decorators.TenantId)()),
+    _ts_param(1, (0, _common.Body)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String,
+        typeof CreateUserDto === "undefined" ? Object : CreateUserDto
+    ]),
+    _ts_metadata("design:returntype", Promise)
 ], TenantsController.prototype, "createUser", null);
-__decorate([
-    (0, common_1.Get)('current/roles'),
-    __param(0, (0, decorators_1.TenantId)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
+_ts_decorate([
+    (0, _common.Get)('current/roles'),
+    _ts_param(0, (0, _decorators.TenantId)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String
+    ]),
+    _ts_metadata("design:returntype", Promise)
 ], TenantsController.prototype, "listRoles", null);
-__decorate([
-    (0, common_1.Get)('current/subscription'),
-    (0, decorators_1.Permissions)('settings.billing.read'),
-    __param(0, (0, decorators_1.TenantId)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
+_ts_decorate([
+    (0, _common.Get)('current/subscription'),
+    (0, _decorators.Permissions)('settings.billing.read'),
+    _ts_param(0, (0, _decorators.TenantId)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String
+    ]),
+    _ts_metadata("design:returntype", Promise)
 ], TenantsController.prototype, "getSubscription", null);
-__decorate([
-    (0, common_1.Post)('current/upgrade'),
-    (0, decorators_1.Permissions)('settings.billing.update'),
-    __param(0, (0, decorators_1.TenantId)()),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, UpgradePlanDto]),
-    __metadata("design:returntype", Promise)
+_ts_decorate([
+    (0, _common.Post)('current/upgrade'),
+    (0, _decorators.Permissions)('settings.billing.update'),
+    _ts_param(0, (0, _decorators.TenantId)()),
+    _ts_param(1, (0, _common.Body)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String,
+        typeof UpgradePlanDto === "undefined" ? Object : UpgradePlanDto
+    ]),
+    _ts_metadata("design:returntype", Promise)
 ], TenantsController.prototype, "upgradePlan", null);
-exports.TenantsController = TenantsController = __decorate([
-    (0, common_1.Controller)('tenants'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    __metadata("design:paramtypes", [tenants_service_1.TenantsService])
+TenantsController = _ts_decorate([
+    (0, _common.Controller)('tenants'),
+    (0, _common.UseGuards)(_jwtauthguard.JwtAuthGuard),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        typeof _tenantsservice.TenantsService === "undefined" ? Object : _tenantsservice.TenantsService
+    ])
 ], TenantsController);
+
 //# sourceMappingURL=tenants.controller.js.map

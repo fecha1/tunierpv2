@@ -1,198 +1,228 @@
 "use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+Object.defineProperty(exports, "InventoryController", {
+    enumerable: true,
+    get: function() {
+        return InventoryController;
+    }
+});
+const _common = require("@nestjs/common");
+const _jwtauthguard = require("../../shared/guards/jwt-auth.guard");
+const _decorators = require("../../shared/decorators");
+const _modinventory = require("@tunierp/mod-inventory");
+const _classvalidator = require("class-validator");
+function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    else for(var i = decorators.length - 1; i >= 0; i--)if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
+}
+function _ts_metadata(k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.InventoryController = void 0;
-const common_1 = require("@nestjs/common");
-const jwt_auth_guard_1 = require("../../shared/guards/jwt-auth.guard");
-const decorators_1 = require("../../shared/decorators");
-const mod_inventory_1 = require("@tunierp/mod-inventory");
-const class_validator_1 = require("class-validator");
+}
+function _ts_param(paramIndex, decorator) {
+    return function(target, key) {
+        decorator(target, key, paramIndex);
+    };
+}
 // ── DTOs ─────────────────────────────────────────────────
-class CreateMovementDto {
-    productId;
-    variantId;
-    warehouseId;
-    type;
-    quantity;
-    reason;
-    referenceType;
-    referenceId;
-}
-__decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+let CreateMovementDto = class CreateMovementDto {
+};
+_ts_decorate([
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], CreateMovementDto.prototype, "productId", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsOptional)(),
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], CreateMovementDto.prototype, "variantId", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], CreateMovementDto.prototype, "warehouseId", void 0);
-__decorate([
-    (0, class_validator_1.IsIn)(['in', 'out', 'adjustment', 'transfer', 'return']),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsIn)([
+        'in',
+        'out',
+        'adjustment',
+        'transfer'
+    ]),
+    _ts_metadata("design:type", String)
 ], CreateMovementDto.prototype, "type", void 0);
-__decorate([
-    (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.Min)(0.01),
-    __metadata("design:type", Number)
+_ts_decorate([
+    (0, _classvalidator.IsNumber)(),
+    (0, _classvalidator.Min)(0.01),
+    _ts_metadata("design:type", Number)
 ], CreateMovementDto.prototype, "quantity", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsOptional)(),
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], CreateMovementDto.prototype, "reason", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsOptional)(),
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], CreateMovementDto.prototype, "referenceType", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsOptional)(),
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], CreateMovementDto.prototype, "referenceId", void 0);
-class CreateWarehouseDto {
-    name;
-    code;
-    address;
-    isDefault;
-}
-__decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+let CreateWarehouseDto = class CreateWarehouseDto {
+};
+_ts_decorate([
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], CreateWarehouseDto.prototype, "name", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], CreateWarehouseDto.prototype, "code", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+_ts_decorate([
+    (0, _classvalidator.IsOptional)(),
+    (0, _classvalidator.IsString)(),
+    _ts_metadata("design:type", String)
 ], CreateWarehouseDto.prototype, "address", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Boolean)
+_ts_decorate([
+    (0, _classvalidator.IsOptional)(),
+    _ts_metadata("design:type", Boolean)
 ], CreateWarehouseDto.prototype, "isDefault", void 0);
-// ── Controller ───────────────────────────────────────────
 let InventoryController = class InventoryController {
     async getStats(tenantId) {
-        return (0, mod_inventory_1.getInventoryStats)(tenantId);
+        return (0, _modinventory.getInventoryStats)(tenantId);
     }
     async getStock(tenantId, warehouseId, categoryId, lowStockOnly, search) {
-        return (0, mod_inventory_1.getStockLevels)(tenantId, {
+        return (0, _modinventory.getStockLevels)(tenantId, {
             warehouseId,
             categoryId,
             lowStockOnly: lowStockOnly === 'true',
-            search,
+            search
         });
     }
     async listMovements(tenantId, warehouseId, type, limit) {
-        return (0, mod_inventory_1.getMovements)(tenantId, {
+        return (0, _modinventory.getMovements)(tenantId, {
             warehouseId,
             type,
-            limit: limit ? parseInt(limit) : undefined,
+            limit: limit ? parseInt(limit) : undefined
         });
     }
     async addMovement(tenantId, auth, dto) {
-        return (0, mod_inventory_1.createMovement)(tenantId, { ...dto, userId: auth.userId });
+        return (0, _modinventory.createMovement)(tenantId, {
+            ...dto,
+            userId: auth.userId
+        });
     }
     async listWarehouses(tenantId) {
-        return (0, mod_inventory_1.getWarehouses)(tenantId);
+        return (0, _modinventory.getWarehouses)(tenantId);
     }
     async addWarehouse(tenantId, dto) {
-        return (0, mod_inventory_1.createWarehouse)(tenantId, dto);
+        return (0, _modinventory.createWarehouse)(tenantId, dto);
     }
     async editWarehouse(tenantId, id, dto) {
-        return (0, mod_inventory_1.updateWarehouse)(tenantId, id, dto);
+        return (0, _modinventory.updateWarehouse)(tenantId, id, dto);
     }
 };
-exports.InventoryController = InventoryController;
-__decorate([
-    (0, common_1.Get)('stats'),
-    (0, decorators_1.Permissions)('inventory.read'),
-    __param(0, (0, decorators_1.TenantId)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
+_ts_decorate([
+    (0, _common.Get)('stats'),
+    (0, _decorators.Permissions)('inventory.read'),
+    _ts_param(0, (0, _decorators.TenantId)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String
+    ]),
+    _ts_metadata("design:returntype", Promise)
 ], InventoryController.prototype, "getStats", null);
-__decorate([
-    (0, common_1.Get)('stock'),
-    (0, decorators_1.Permissions)('inventory.read'),
-    __param(0, (0, decorators_1.TenantId)()),
-    __param(1, (0, common_1.Query)('warehouseId')),
-    __param(2, (0, common_1.Query)('categoryId')),
-    __param(3, (0, common_1.Query)('lowStockOnly')),
-    __param(4, (0, common_1.Query)('search')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String, String, String]),
-    __metadata("design:returntype", Promise)
+_ts_decorate([
+    (0, _common.Get)('stock'),
+    (0, _decorators.Permissions)('inventory.read'),
+    _ts_param(0, (0, _decorators.TenantId)()),
+    _ts_param(1, (0, _common.Query)('warehouseId')),
+    _ts_param(2, (0, _common.Query)('categoryId')),
+    _ts_param(3, (0, _common.Query)('lowStockOnly')),
+    _ts_param(4, (0, _common.Query)('search')),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String,
+        String,
+        String,
+        String,
+        String
+    ]),
+    _ts_metadata("design:returntype", Promise)
 ], InventoryController.prototype, "getStock", null);
-__decorate([
-    (0, common_1.Get)('movements'),
-    (0, decorators_1.Permissions)('inventory.read'),
-    __param(0, (0, decorators_1.TenantId)()),
-    __param(1, (0, common_1.Query)('warehouseId')),
-    __param(2, (0, common_1.Query)('type')),
-    __param(3, (0, common_1.Query)('limit')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String, String]),
-    __metadata("design:returntype", Promise)
+_ts_decorate([
+    (0, _common.Get)('movements'),
+    (0, _decorators.Permissions)('inventory.read'),
+    _ts_param(0, (0, _decorators.TenantId)()),
+    _ts_param(1, (0, _common.Query)('warehouseId')),
+    _ts_param(2, (0, _common.Query)('type')),
+    _ts_param(3, (0, _common.Query)('limit')),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String,
+        String,
+        String,
+        String
+    ]),
+    _ts_metadata("design:returntype", Promise)
 ], InventoryController.prototype, "listMovements", null);
-__decorate([
-    (0, common_1.Post)('movements'),
-    (0, decorators_1.Permissions)('inventory.create'),
-    __param(0, (0, decorators_1.TenantId)()),
-    __param(1, (0, decorators_1.Auth)()),
-    __param(2, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object, CreateMovementDto]),
-    __metadata("design:returntype", Promise)
+_ts_decorate([
+    (0, _common.Post)('movements'),
+    (0, _decorators.Permissions)('inventory.create'),
+    _ts_param(0, (0, _decorators.TenantId)()),
+    _ts_param(1, (0, _decorators.Auth)()),
+    _ts_param(2, (0, _common.Body)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String,
+        typeof AuthContext === "undefined" ? Object : AuthContext,
+        typeof CreateMovementDto === "undefined" ? Object : CreateMovementDto
+    ]),
+    _ts_metadata("design:returntype", Promise)
 ], InventoryController.prototype, "addMovement", null);
-__decorate([
-    (0, common_1.Get)('warehouses'),
-    (0, decorators_1.Permissions)('inventory.read'),
-    __param(0, (0, decorators_1.TenantId)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
+_ts_decorate([
+    (0, _common.Get)('warehouses'),
+    (0, _decorators.Permissions)('inventory.read'),
+    _ts_param(0, (0, _decorators.TenantId)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String
+    ]),
+    _ts_metadata("design:returntype", Promise)
 ], InventoryController.prototype, "listWarehouses", null);
-__decorate([
-    (0, common_1.Post)('warehouses'),
-    (0, decorators_1.Permissions)('inventory.warehouses.manage'),
-    __param(0, (0, decorators_1.TenantId)()),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, CreateWarehouseDto]),
-    __metadata("design:returntype", Promise)
+_ts_decorate([
+    (0, _common.Post)('warehouses'),
+    (0, _decorators.Permissions)('inventory.warehouses.manage'),
+    _ts_param(0, (0, _decorators.TenantId)()),
+    _ts_param(1, (0, _common.Body)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String,
+        typeof CreateWarehouseDto === "undefined" ? Object : CreateWarehouseDto
+    ]),
+    _ts_metadata("design:returntype", Promise)
 ], InventoryController.prototype, "addWarehouse", null);
-__decorate([
-    (0, common_1.Patch)('warehouses/:id'),
-    (0, decorators_1.Permissions)('inventory.warehouses.manage'),
-    __param(0, (0, decorators_1.TenantId)()),
-    __param(1, (0, common_1.Param)('id')),
-    __param(2, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, CreateWarehouseDto]),
-    __metadata("design:returntype", Promise)
+_ts_decorate([
+    (0, _common.Patch)('warehouses/:id'),
+    (0, _decorators.Permissions)('inventory.warehouses.manage'),
+    _ts_param(0, (0, _decorators.TenantId)()),
+    _ts_param(1, (0, _common.Param)('id')),
+    _ts_param(2, (0, _common.Body)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String,
+        String,
+        typeof CreateWarehouseDto === "undefined" ? Object : CreateWarehouseDto
+    ]),
+    _ts_metadata("design:returntype", Promise)
 ], InventoryController.prototype, "editWarehouse", null);
-exports.InventoryController = InventoryController = __decorate([
-    (0, common_1.Controller)('inventory'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard)
+InventoryController = _ts_decorate([
+    (0, _common.Controller)('inventory'),
+    (0, _common.UseGuards)(_jwtauthguard.JwtAuthGuard)
 ], InventoryController);
+
 //# sourceMappingURL=inventory.controller.js.map

@@ -15,6 +15,7 @@ const cspHeader = `
 `;
 
 const nextConfig = {
+  output: process.env.DOCKER_BUILD === '1' ? 'standalone' : undefined,
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,

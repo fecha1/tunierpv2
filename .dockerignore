@@ -1,0 +1,50 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs
+.next
+**/dist
+**/.next
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files (injected via docker-compose)
+.env
+.env.*
+!.env.docker.example
+
+# Turborepo
+.turbo
+**/.turbo
+
+# Prisma engines (will be regenerated)
+**/prisma/engines
+
+# Logs
+*.log
+npm-debug.log*
+
+# Tests
+coverage
+**/__tests__
+**/*.test.*
+**/*.spec.*
+
+# Misc
+LICENSE
+README.md
+PLAN.txt
+*.md

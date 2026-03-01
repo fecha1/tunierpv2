@@ -1,0 +1,189 @@
+# ============================================================
+# TuniERP — Docker Compose (Development & Production)
+# ============================================================
+# Usage:
+#   Development:  docker compose --profile dev up -d
+#   Production:   docker compose --profile prod up -d
+#   DB only:      docker compose up postgres redis -d
+# ============================================================
+
+services:
+  # ── PostgreSQL Database ──────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: tunierp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tunierp}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tunierp_secret_change_me}
+      POSTGRES_DB: ${POSTGRES_DB:-tunierp}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tunierp}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tunierp-network
+
+  # ── Redis Cache ──────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: tunierp-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tunierp-network
+
+  # ── NestJS API ───────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: tunierp-api
+    restart: unless-stopped
+    profiles: ["prod"]
+    environment:
+      NODE_ENV: production
+      API_PORT: 4060
+      DATABASE_URL: postgresql://${POSTGRES_USER:-tunierp}:${POSTGRES_PASSWORD:-tunierp_secret}@postgres:5432/${POSTGRES_DB:-tunierp}?schema=public
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "4060:4060"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tunierp-network
+
+  # ── Next.js Frontend (Marketing Site) ────────────────────
+  front:
+    build:
+      context: .
+      dockerfile: front/Dockerfile
+    container_name: tunierp-front
+    restart: unless-stopped
+    profiles: ["prod"]
+    environment:
+      NODE_ENV: production
+      PORT: 4050
+      NEXT_PUBLIC_API_HOST: http://api:4060
+      NEXT_PUBLIC_VERSION: v2.0.0
+    ports:
+      - "4050:4050"
+    depends_on:
+      - api
+    networks:
+      - tunierp-network
+
+  # ── Next.js Dashboard ───────────────────────────────────
+  dashboard:
+    build:
+      context: .
+      dockerfile: apps/dashboard/Dockerfile
+    container_name: tunierp-dashboard
+    restart: unless-stopped
+    profiles: ["prod"]
+    environment:
+      NODE_ENV: production
+      PORT: 4052
+      NEXT_PUBLIC_API_HOST: http://api:4060
+      NEXT_PUBLIC_VERSION: v2.0.0
+    ports:
+      - "4052:4052"
+    depends_on:
+      - api
+    networks:
+      - tunierp-network
+
+  # ── API (Development — hot reload) ──────────────────────
+  api-dev:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: builder
+    container_name: tunierp-api-dev
+    profiles: ["dev"]
+    environment:
+      NODE_ENV: development
+      API_PORT: 4060
+      DATABASE_URL: postgresql://${POSTGRES_USER:-tunierp}:${POSTGRES_PASSWORD:-tunierp_secret}@postgres:5432/${POSTGRES_DB:-tunierp}?schema=public
+      JWT_SECRET: ${JWT_SECRET:-dev_jwt_secret_change_me}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev_jwt_refresh_secret_change_me}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - ./apps/api/src:/app/apps/api/src
+      - ./packages:/app/packages
+    ports:
+      - "4060:4060"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["pnpm", "--filter", "@tunierp/api", "run", "dev"]
+    networks:
+      - tunierp-network
+
+  # ── Prisma DB Migrations (one-shot) ─────────────────────
+  db-migrate:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: builder
+    container_name: tunierp-db-migrate
+    profiles: ["migrate"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-tunierp}:${POSTGRES_PASSWORD:-tunierp_secret}@postgres:5432/${POSTGRES_DB:-tunierp}?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["pnpm", "--filter", "@tunierp/database", "run", "db:push"]
+    networks:
+      - tunierp-network
+
+  # ── Prisma Seed (one-shot) ──────────────────────────────
+  db-seed:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: builder
+    container_name: tunierp-db-seed
+    profiles: ["seed"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-tunierp}:${POSTGRES_PASSWORD:-tunierp_secret}@postgres:5432/${POSTGRES_DB:-tunierp}?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["pnpm", "--filter", "@tunierp/database", "run", "db:seed"]
+    networks:
+      - tunierp-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  tunierp-network:
+    driver: bridge
