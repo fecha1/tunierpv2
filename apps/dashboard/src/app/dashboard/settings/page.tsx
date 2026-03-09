@@ -29,18 +29,7 @@ export default function SettingsPage() {
     }
   }
 
-  async function toggleModule(code: string, isActive: boolean) {
-    try {
-      if (isActive) {
-        await api.post(`/modules/${code}/deactivate`);
-      } else {
-        await api.post(`/modules/${code}/activate`);
-      }
-      await loadModules();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Erreur lors de la modification du module');
-    }
-  }
+
 
   return (
     <div>
@@ -50,6 +39,43 @@ export default function SettingsPage() {
       <p style={{ color: '#666', fontSize: 14, marginBottom: 32 }}>
         Gérez les modules et la configuration de {tenant?.name}
       </p>
+
+      {/* Info banner */}
+      <div style={{
+        background: '#eef2ff',
+        border: '1px solid #c5cae9',
+        borderRadius: 12,
+        padding: '16px 20px',
+        marginBottom: 24,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 16,
+      }}>
+        <div>
+          <p style={{ fontSize: 13, color: '#264b8d', fontWeight: 600, marginBottom: 4 }}>
+            Besoin d&apos;un module supplémentaire ?
+          </p>
+          <p style={{ fontSize: 12, color: '#666' }}>
+            Contactez l&apos;administrateur de la plateforme pour activer des modules payants.
+          </p>
+        </div>
+        <a
+          href="mailto:contact@tunierp.tn?subject=Demande d'activation de module"
+          style={{
+            padding: '8px 20px',
+            borderRadius: 8,
+            background: '#264b8d',
+            color: '#fff',
+            fontSize: 12,
+            fontWeight: 600,
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          Demander un module
+        </a>
+      </div>
 
       {/* Modules management */}
       <div style={{
@@ -61,7 +87,7 @@ export default function SettingsPage() {
         <div style={{ padding: '20px 24px', borderBottom: '1px solid #e8ecf1' }}>
           <h3 style={{ fontSize: 16, fontWeight: 600, color: '#333' }}>Modules disponibles</h3>
           <p style={{ fontSize: 13, color: '#888', marginTop: 4 }}>
-            Activez ou désactivez les modules selon vos besoins
+            Les modules sont gérés par l&apos;administrateur de la plateforme
           </p>
         </div>
 
@@ -107,23 +133,19 @@ export default function SettingsPage() {
                     )}
                   </div>
 
-                  <button
-                    onClick={() => !mod.isCore && toggleModule(mod.code, isActive)}
-                    disabled={mod.isCore}
+                  <span
                     style={{
                       padding: '8px 20px',
                       borderRadius: 8,
-                      border: isActive ? '1px solid #e53935' : '1px solid #264b8d',
-                      background: isActive ? '#fff0f0' : '#eef2ff',
-                      color: isActive ? '#e53935' : '#264b8d',
+                      border: isActive ? '1px solid #2e7d32' : '1px solid #bbb',
+                      background: isActive ? '#e8f5e9' : '#f5f5f5',
+                      color: isActive ? '#2e7d32' : '#888',
                       fontWeight: 600,
                       fontSize: 12,
-                      cursor: mod.isCore ? 'default' : 'pointer',
-                      opacity: mod.isCore ? 0.5 : 1,
                     }}
                   >
-                    {mod.isCore ? 'Inclus' : isActive ? 'Désactiver' : 'Activer'}
-                  </button>
+                    {mod.isCore ? 'Inclus' : isActive ? 'Activé' : 'Non activé'}
+                  </span>
                 </div>
               );
             })}

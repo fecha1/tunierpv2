@@ -19,6 +19,7 @@ export {
   requireAnyPermission,
   requireRoleLevel,
   requireModule,
+  requireSuperAdmin,
   AuthError,
 } from './guards';
 export type { AuthContext } from './guards';

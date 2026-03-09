@@ -1,21 +1,32 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+
 // @mui
 import { useTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import CircularProgress from '@mui/material/CircularProgress';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 
 // @project
 import MainCard from '@/components/MainCard';
+import api from '@/lib/api';
 
-// @assets
-import { IconPackage, IconShoppingCart, IconUsers, IconCash, IconFileInvoice, IconAlertTriangle, IconTrendingUp, IconChecklist } from '@tabler/icons-react';
+// @icons
+import { IconBuilding, IconUsers, IconCash, IconTrendingUp, IconPuzzle } from '@tabler/icons-react';
 
 /***************************  STAT CARD COMPONENT  ***************************/
 
-function StatCard({ title, value, icon, color }) {
+function StatCard({ title, value, icon, color, subtitle }) {
   return (
     <MainCard sx={{ p: 0 }}>
       <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', p: 2.5 }}>
@@ -26,6 +37,11 @@ function StatCard({ title, value, icon, color }) {
           <Typography variant="h4" sx={{ fontWeight: 700 }}>
             {value}
           </Typography>
+          {subtitle && (
+            <Typography variant="caption" color="text.secondary">
+              {subtitle}
+            </Typography>
+          )}
         </Stack>
         <Box
           sx={{
@@ -45,60 +61,41 @@ function StatCard({ title, value, icon, color }) {
   );
 }
 
-/***************************  QUICK ACTION CARD  ***************************/
-
-function QuickAction({ title, description, icon, color }) {
-  return (
-    <MainCard
-      sx={{
-        p: 2,
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-        '&:hover': { boxShadow: 4, transform: 'translateY(-2px)' }
-      }}
-    >
-      <Stack direction="row" sx={{ gap: 2, alignItems: 'center' }}>
-        <Box
-          sx={{
-            width: 40,
-            height: 40,
-            borderRadius: 1.5,
-            bgcolor: `${color}15`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0
-          }}
-        >
-          {icon}
-        </Box>
-        <Stack>
-          <Typography variant="subtitle2">{title}</Typography>
-          <Typography variant="caption" color="text.secondary">{description}</Typography>
-        </Stack>
-      </Stack>
-    </MainCard>
-  );
-}
-
-/***************************  TUNIERP - DASHBOARD  ***************************/
+/***************************  PLATFORM DASHBOARD  ***************************/
 
 export default function Dashboard() {
   const theme = useTheme();
+  const [stats, setStats] = useState(null);
+  const [recentTenants, setRecentTenants] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const stats = [
-    { title: 'Produits', value: '0', icon: <IconPackage size={24} color={theme.palette.primary.main} />, color: theme.palette.primary.main },
-    { title: 'Commandes', value: '0', icon: <IconShoppingCart size={24} color={theme.palette.success.main} />, color: theme.palette.success.main },
-    { title: 'Clients', value: '0', icon: <IconUsers size={24} color={theme.palette.info.main} />, color: theme.palette.info.main },
-    { title: "Chiffre d'affaires", value: '0 TND', icon: <IconCash size={24} color={theme.palette.warning.main} />, color: theme.palette.warning.main }
-  ];
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [statsRes, tenantsRes] = await Promise.all([
+          api.get('/admin/stats'),
+          api.get('/admin/tenants', { params: { limit: 5 } }),
+        ]);
+        setStats(statsRes.data);
+        setRecentTenants(tenantsRes.data.data || []);
+      } catch (err) {
+        console.error('Failed to fetch dashboard data:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
 
-  const quickActions = [
-    { title: 'Nouvelle Vente', description: 'Ouvrir le Point de Vente', icon: <IconShoppingCart size={20} color={theme.palette.primary.main} />, color: theme.palette.primary.main },
-    { title: 'Ajouter Produit', description: 'Créer un nouveau produit', icon: <IconPackage size={20} color={theme.palette.success.main} />, color: theme.palette.success.main },
-    { title: 'Créer Facture', description: 'Générer une facture', icon: <IconFileInvoice size={20} color={theme.palette.info.main} />, color: theme.palette.info.main },
-    { title: 'Voir les Tâches', description: 'Gérer vos tâches', icon: <IconChecklist size={20} color={theme.palette.warning.main} />, color: theme.palette.warning.main }
-  ];
+  if (loading) {
+    return (
+      <Stack sx={{ alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
+        <CircularProgress />
+      </Stack>
+    );
+  }
+
+  const statusColors = { active: 'success', trial: 'info', suspended: 'error', cancelled: 'default' };
 
   return (
     <Grid container spacing={{ xs: 2, md: 3 }}>
@@ -114,45 +111,115 @@ export default function Dashboard() {
         >
           <Stack sx={{ gap: 1 }}>
             <Typography variant="h4" sx={{ fontWeight: 700, color: 'white' }}>
-              Bienvenue sur TuniERP 👋
+              Administration TuniERP 🛡️
             </Typography>
             <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', maxWidth: 600 }}>
-              Votre plateforme ERP modulaire. Gérez vos ventes, inventaire, factures et clients — tout en un seul endroit.
+              Gérez vos tenants, modules et plans depuis cette interface. Vue d&apos;ensemble de la plateforme.
             </Typography>
           </Stack>
         </MainCard>
       </Grid>
 
       {/* Stats Cards */}
-      {stats.map((stat, index) => (
-        <Grid key={index} size={{ xs: 6, md: 3 }}>
-          <StatCard {...stat} />
-        </Grid>
-      ))}
-
-      {/* Quick Actions */}
-      <Grid size={12}>
-        <Typography variant="h6" sx={{ mb: 1 }}>
-          Actions Rapides
-        </Typography>
+      <Grid size={{ xs: 6, md: 3 }}>
+        <StatCard
+          title="Tenants"
+          value={stats?.tenants?.total || 0}
+          subtitle={`${stats?.tenants?.active || 0} actifs · ${stats?.tenants?.trial || 0} en essai`}
+          icon={<IconBuilding size={24} color={theme.palette.primary.main} />}
+          color={theme.palette.primary.main}
+        />
       </Grid>
-      {quickActions.map((action, index) => (
-        <Grid key={index} size={{ xs: 12, sm: 6, md: 3 }}>
-          <QuickAction {...action} />
-        </Grid>
-      ))}
+      <Grid size={{ xs: 6, md: 3 }}>
+        <StatCard
+          title="Utilisateurs"
+          value={stats?.users?.total || 0}
+          subtitle={`${stats?.users?.active || 0} actifs`}
+          icon={<IconUsers size={24} color={theme.palette.info.main} />}
+          color={theme.palette.info.main}
+        />
+      </Grid>
+      <Grid size={{ xs: 6, md: 3 }}>
+        <StatCard
+          title="Revenu Mensuel"
+          value={`${stats?.revenue?.monthly || 0} TND`}
+          icon={<IconCash size={24} color={theme.palette.success.main} />}
+          color={theme.palette.success.main}
+        />
+      </Grid>
+      <Grid size={{ xs: 6, md: 3 }}>
+        <StatCard
+          title="Inscriptions ce mois"
+          value={stats?.newSignupsThisMonth || 0}
+          icon={<IconTrendingUp size={24} color={theme.palette.warning.main} />}
+          color={theme.palette.warning.main}
+        />
+      </Grid>
 
-      {/* Alerts Placeholder */}
-      <Grid size={12}>
-        <MainCard sx={{ p: 2.5 }}>
-          <Stack direction="row" sx={{ gap: 2, alignItems: 'center' }}>
-            <IconAlertTriangle size={20} color={theme.palette.warning.main} />
-            <Stack>
-              <Typography variant="subtitle2">Aucune alerte</Typography>
-              <Typography variant="caption" color="text.secondary">
-                Tout est en ordre. Les alertes de stock et paiements apparaîtront ici.
-              </Typography>
-            </Stack>
+      {/* Recent Tenants */}
+      <Grid size={{ xs: 12, md: 7 }}>
+        <MainCard title="Derniers Tenants">
+          <TableContainer>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Nom</TableCell>
+                  <TableCell>Plan</TableCell>
+                  <TableCell>Statut</TableCell>
+                  <TableCell align="right">Utilisateurs</TableCell>
+                  <TableCell align="right">Modules</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {recentTenants.map((tenant) => (
+                  <TableRow key={tenant.id} hover>
+                    <TableCell>
+                      <Stack>
+                        <Typography variant="subtitle2">{tenant.name}</Typography>
+                        <Typography variant="caption" color="text.secondary">{tenant.slug}</Typography>
+                      </Stack>
+                    </TableCell>
+                    <TableCell>{tenant.plan?.name || '—'}</TableCell>
+                    <TableCell>
+                      <Chip label={tenant.status} size="small" color={statusColors[tenant.status] || 'default'} />
+                    </TableCell>
+                    <TableCell align="right">{tenant.usersCount}</TableCell>
+                    <TableCell align="right">{tenant.modulesCount}</TableCell>
+                  </TableRow>
+                ))}
+                {recentTenants.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center">
+                      <Typography variant="body2" color="text.secondary">Aucun tenant</Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </MainCard>
+      </Grid>
+
+      {/* Module Popularity */}
+      <Grid size={{ xs: 12, md: 5 }}>
+        <MainCard title="Modules populaires">
+          <Stack sx={{ gap: 1.5 }}>
+            {(stats?.modules || [])
+              .filter((m) => !m.isCore)
+              .sort((a, b) => b.activationCount - a.activationCount)
+              .slice(0, 6)
+              .map((mod) => (
+                <Stack key={mod.code} direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
+                    <IconPuzzle size={16} color={theme.palette.primary.main} />
+                    <Typography variant="body2">{mod.name}</Typography>
+                  </Stack>
+                  <Chip label={`${mod.activationCount} tenants`} size="small" variant="outlined" />
+                </Stack>
+              ))}
+            {(!stats?.modules || stats.modules.filter((m) => !m.isCore).length === 0) && (
+              <Typography variant="body2" color="text.secondary">Aucun module payant activé</Typography>
+            )}
           </Stack>
         </MainCard>
       </Grid>

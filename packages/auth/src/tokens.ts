@@ -9,12 +9,14 @@ export interface TokenPayload {
   email: string;
   roleCode: string;
   roleLevel: number;
+  isSuperAdmin: boolean;
 }
 
 export interface RefreshTokenPayload {
   userId: string;
   tenantId: string;
   tokenId: string;
+  isSuperAdmin: boolean;
 }
 
 const JWT_SECRET = process.env.JWT_SECRET || 'tunierp-dev-secret';

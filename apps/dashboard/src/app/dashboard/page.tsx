@@ -100,6 +100,73 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Plan usage */}
+      {stats?.subscription?.usage && (
+        <div style={{ marginTop: 32 }}>
+          <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: '#333' }}>
+            Utilisation du plan
+          </h3>
+          <div style={{
+            background: '#fff',
+            borderRadius: 14,
+            border: '1px solid #e8ecf1',
+            padding: 24,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 20,
+          }}>
+            <UsageBar
+              label="Utilisateurs"
+              current={stats.subscription.usage.users || 0}
+              max={stats.subscription.usage.maxUsers}
+              color="#264b8d"
+            />
+            <UsageBar
+              label="Produits"
+              current={stats.subscription.usage.products || 0}
+              max={stats.subscription.usage.maxProducts}
+              color="#e65100"
+            />
+            <UsageBar
+              label="Modules actifs"
+              current={stats.subscription.activeModules?.length || 0}
+              max={stats.subscription.usage.maxModules}
+              color="#6a1b9a"
+            />
+          </div>
+          <div style={{
+            marginTop: 16,
+            padding: '12px 16px',
+            background: '#eef2ff',
+            borderRadius: 10,
+            border: '1px solid #c5cae9',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+            <span style={{ fontSize: 13, color: '#333' }}>
+              Votre plan : <strong style={{ color: '#264b8d' }}>{stats.subscription.plan?.name || '—'}</strong>
+            </span>
+            <a
+              href="http://localhost:4050/pricing"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                padding: '6px 16px',
+                borderRadius: 8,
+                background: '#264b8d',
+                color: '#fff',
+                fontSize: 12,
+                fontWeight: 600,
+                textDecoration: 'none',
+              }}
+            >
+              Évoluer mon plan ↗
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -125,6 +192,46 @@ function StatCard({ title, value, subtitle, color }: {
         {value}
       </p>
       <p style={{ fontSize: 12, color: '#999' }}>{subtitle}</p>
+    </div>
+  );
+}
+
+function UsageBar({ label, current, max, color }: {
+  label: string;
+  current: number;
+  max: number | undefined | null;
+  color: string;
+}) {
+  const isUnlimited = !max || max === -1;
+  const pct = isUnlimited ? 0 : Math.min((current / max) * 100, 100);
+  const isHigh = !isUnlimited && pct >= 80;
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+        <span style={{ fontSize: 13, fontWeight: 500, color: '#333' }}>{label}</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: isHigh ? '#e53935' : color }}>
+          {current} / {isUnlimited ? '∞' : max}
+        </span>
+      </div>
+      {!isUnlimited && (
+        <div style={{
+          height: 8,
+          borderRadius: 4,
+          background: '#f0f2f5',
+          overflow: 'hidden',
+        }}>
+          <div
+            style={{
+              height: '100%',
+              width: `${pct}%`,
+              borderRadius: 4,
+              background: isHigh ? '#e53935' : color,
+              transition: 'width 0.5s ease',
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

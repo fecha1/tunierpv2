@@ -35,7 +35,7 @@ export class JwtAuthGuard implements CanActivate {
 
     if (requiredModule) {
       try {
-        await requireModule(authCtx.tenantId, requiredModule);
+        await requireModule(authCtx.tenantId, requiredModule, authCtx.isSuperAdmin);
       } catch {
         throw new ForbiddenException(`Module "${requiredModule}" non activé`);
       }

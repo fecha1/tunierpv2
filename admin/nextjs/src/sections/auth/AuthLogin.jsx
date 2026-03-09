@@ -2,7 +2,6 @@
 import PropTypes from 'prop-types';
 
 // @next
-import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { useState } from 'react';
@@ -15,7 +14,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
-import Link from '@mui/material/Link';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
@@ -26,20 +24,10 @@ import { useForm } from 'react-hook-form';
 // @project
 import { APP_DEFAULT_PATH } from '@/config';
 import { emailSchema, passwordSchema } from '@/utils/validation-schema/common';
+import api from '@/lib/api';
 
 // @icons
 import { IconEye, IconEyeOff } from '@tabler/icons-react';
-
-// Mock user credentials
-const userCredentials = [
-  { title: 'Super Admin', email: 'super_admin@tunierp.tn', password: 'Super@123' },
-  { title: 'Admin', email: 'admin@tunierp.tn', password: 'Admin@123' },
-  { title: 'User', email: 'user@tunierp.tn', password: 'User@123' }
-];
-
-function isChildObjectContained(parent, child) {
-  return Object.entries(child).every(([key, value]) => parent.hasOwnProperty(key) && parent[key] === value);
-}
 
 /***************************  AUTH - LOGIN  ***************************/
 
@@ -51,51 +39,55 @@ export default function AuthLogin({ inputSx }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [loginError, setLoginError] = useState('');
 
-  // Initialize react-hook-form
   const {
     register,
-    watch,
     handleSubmit,
-    reset,
     formState: { errors }
-  } = useForm({ defaultValues: { email: 'super_admin@tunierp.tn', password: 'Super@123' } });
+  } = useForm({ defaultValues: { email: '', password: '' } });
 
-  const formData = watch();
-
-  // Handle form submission
-  const onSubmit = (formData) => {
+  const onSubmit = async (formData) => {
     setIsProcessing(true);
     setLoginError('');
 
-    router.push(APP_DEFAULT_PATH);
+    try {
+      const res = await api.post('/auth/login', {
+        email: formData.email,
+        password: formData.password,
+      });
+
+      const { accessToken, refreshToken, user, tenant } = res.data;
+
+      // Only allow super admins to access the admin panel
+      if (!user.isSuperAdmin) {
+        setLoginError('Accès réservé aux super administrateurs');
+        setIsProcessing(false);
+        return;
+      }
+
+      // Store tokens and user info
+      localStorage.setItem('tunierp_admin_access_token', accessToken);
+      localStorage.setItem('tunierp_admin_refresh_token', refreshToken);
+      localStorage.setItem('tunierp_admin_user', JSON.stringify(user));
+
+      router.push(APP_DEFAULT_PATH);
+    } catch (err) {
+      const message = err.response?.data?.message || 'Erreur de connexion';
+      setLoginError(message);
+      setIsProcessing(false);
+    }
   };
 
   const commonIconProps = { size: 16, color: theme.vars.palette.grey[700] };
 
   return (
     <>
-      <Stack direction="row" sx={{ gap: 1, mb: 2 }}>
-        {userCredentials.map((credential) => (
-          <Button
-            key={credential.title}
-            variant="outlined"
-            color={isChildObjectContained(credential, formData) ? 'primary' : 'secondary'}
-            sx={{ flex: 1 }}
-            onClick={() => {
-              reset({ email: credential.email, password: credential.password });
-            }}
-          >
-            {credential.title}
-          </Button>
-        ))}
-      </Stack>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack gap={2}>
           <Box>
             <InputLabel>Email</InputLabel>
             <OutlinedInput
               {...register('email', emailSchema)}
-              placeholder="exemple@tunierp.tn"
+              placeholder="super@tunierp.tn"
               fullWidth
               error={Boolean(errors.email)}
               sx={inputSx}
@@ -104,11 +96,11 @@ export default function AuthLogin({ inputSx }) {
           </Box>
 
           <Box>
-            <InputLabel>Password</InputLabel>
+            <InputLabel>Mot de passe</InputLabel>
             <OutlinedInput
               {...register('password', passwordSchema)}
               type={isPasswordVisible ? 'text' : 'password'}
-              placeholder="Enter your password"
+              placeholder="Entrez votre mot de passe"
               fullWidth
               error={Boolean(errors.password)}
               endAdornment={
@@ -118,19 +110,7 @@ export default function AuthLogin({ inputSx }) {
               }
               sx={inputSx}
             />
-            <Stack direction="row" sx={{ alignItems: 'center', justifyContent: errors.password ? 'space-between' : 'flex-end', width: 1 }}>
-              {errors.password?.message && <FormHelperText error>{errors.password.message}</FormHelperText>}
-              <Link
-                component={NextLink}
-                underline="hover"
-                variant="caption"
-                href="#"
-                textAlign="right"
-                sx={{ '&:hover': { color: 'primary.dark' }, mt: 0.75 }}
-              >
-                Forgot Password?
-              </Link>
-            </Stack>
+            {errors.password?.message && <FormHelperText error>{errors.password.message}</FormHelperText>}
           </Box>
         </Stack>
 
@@ -142,7 +122,7 @@ export default function AuthLogin({ inputSx }) {
           endIcon={isProcessing && <CircularProgress color="secondary" size={16} />}
           sx={{ minWidth: 120, mt: { xs: 1, sm: 4 }, '& .MuiButton-endIcon': { ml: 1 } }}
         >
-          Sign In
+          Connexion
         </Button>
 
         {loginError && (
@@ -154,5 +134,3 @@ export default function AuthLogin({ inputSx }) {
     </>
   );
 }
-
-AuthLogin.propTypes = { inputSx: PropTypes.any };

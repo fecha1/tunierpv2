@@ -16,21 +16,24 @@ export class AuthService {
    * Login with email + password
    */
   async login(email: string, password: string) {
-    // Find user by email (across all tenants — email is unique per tenant)
-    const user = await prisma.user.findFirst({
-      where: { email, isActive: true },
+    // Email is globally unique — findUnique guarantees one result
+    const user = await prisma.user.findUnique({
+      where: { email },
       include: {
         role: true,
         tenant: { select: { id: true, name: true, slug: true, status: true, logoUrl: true } },
       },
     });
 
-    if (!user) {
+    if (!user || !user.isActive) {
       throw new UnauthorizedException('Email ou mot de passe incorrect');
     }
 
-    if (user.tenant.status === 'suspended' || user.tenant.status === 'cancelled') {
-      throw new UnauthorizedException('Votre compte entreprise est suspendu');
+    // Block suspended/cancelled tenants (super admins bypass)
+    if (!user.isSuperAdmin && user.tenant) {
+      if (user.tenant.status === 'suspended' || user.tenant.status === 'cancelled') {
+        throw new UnauthorizedException('Votre compte entreprise est suspendu');
+      }
     }
 
     // Verify password
@@ -42,10 +45,11 @@ export class AuthService {
     // Generate tokens
     const tokenPayload: TokenPayload = {
       userId: user.id,
-      tenantId: user.tenantId,
+      tenantId: user.tenantId || '',
       email: user.email,
       roleCode: user.role?.code || 'viewer',
       roleLevel: user.role?.level || 0,
+      isSuperAdmin: user.isSuperAdmin,
     };
 
     const accessToken = generateAccessToken(tokenPayload);
@@ -53,8 +57,9 @@ export class AuthService {
     const refreshTokenId = randomUUID();
     const refreshToken = generateRefreshToken({
       userId: user.id,
-      tenantId: user.tenantId,
+      tenantId: user.tenantId || '',
       tokenId: refreshTokenId,
+      isSuperAdmin: user.isSuperAdmin,
     });
 
     // Store refresh token in DB
@@ -82,6 +87,7 @@ export class AuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         avatarUrl: user.avatarUrl,
+        isSuperAdmin: user.isSuperAdmin,
         role: user.role ? { code: user.role.code, name: user.role.name, level: user.role.level } : null,
       },
       tenant: user.tenant,
@@ -118,6 +124,13 @@ export class AuthService {
 
     const { user } = storedToken;
 
+    // Check tenant status (super admins bypass)
+    if (!user.isSuperAdmin && user.tenant) {
+      if (user.tenant.status === 'suspended' || user.tenant.status === 'cancelled') {
+        throw new UnauthorizedException('Votre compte entreprise est suspendu');
+      }
+    }
+
     // Revoke old refresh token
     await prisma.refreshToken.update({
       where: { id: payload.tokenId },
@@ -127,17 +140,19 @@ export class AuthService {
     // Generate new tokens
     const newAccessToken = generateAccessToken({
       userId: user.id,
-      tenantId: user.tenantId,
+      tenantId: user.tenantId || '',
       email: user.email,
       roleCode: user.role?.code || 'viewer',
       roleLevel: user.role?.level || 0,
+      isSuperAdmin: user.isSuperAdmin,
     });
 
     const newRefreshTokenId = randomUUID();
     const newRefreshToken = generateRefreshToken({
       userId: user.id,
-      tenantId: user.tenantId,
+      tenantId: user.tenantId || '',
       tokenId: newRefreshTokenId,
+      isSuperAdmin: user.isSuperAdmin,
     });
 
     await prisma.refreshToken.create({
@@ -168,8 +183,8 @@ export class AuthService {
     lastName: string;
     phone?: string;
   }) {
-    // Check if email already exists
-    const existingUser = await prisma.user.findFirst({
+    // Check if email already exists (globally unique)
+    const existingUser = await prisma.user.findUnique({
       where: { email: data.email },
     });
     if (existingUser) {
@@ -281,6 +296,7 @@ export class AuthService {
       email: user.email,
       roleCode: 'tenant_admin',
       roleLevel: 90,
+      isSuperAdmin: false,
     };
 
     const accessToken = generateAccessToken(tokenPayload);
@@ -289,6 +305,7 @@ export class AuthService {
       userId: user.id,
       tenantId: tenant.id,
       tokenId: refreshTokenId,
+      isSuperAdmin: false,
     });
 
     await prisma.refreshToken.create({

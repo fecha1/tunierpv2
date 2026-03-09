@@ -270,22 +270,23 @@ model TenantModule {
 // ─────────────────────────────────────────────────────────────
 
 model User {
-  id           String    @id @default(uuid()) @db.Uuid
-  tenantId     String    @map("tenant_id") @db.Uuid
-  email        String    @db.VarChar(255)
-  passwordHash String    @map("password_hash") @db.VarChar(255)
-  firstName    String?   @map("first_name") @db.VarChar(100)
-  lastName     String?   @map("last_name") @db.VarChar(100)
-  phone        String?   @db.VarChar(50)
-  roleId       String?   @map("role_id") @db.Uuid
-  avatarUrl    String?   @map("avatar_url") @db.VarChar(500)
-  isActive     Boolean   @default(true) @map("is_active")
-  lastLogin    DateTime? @map("last_login")
-  settings     Json      @default("{}")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+  id            String    @id @default(uuid()) @db.Uuid
+  tenantId      String?   @map("tenant_id") @db.Uuid
+  email         String    @db.VarChar(255)
+  passwordHash  String    @map("password_hash") @db.VarChar(255)
+  firstName     String?   @map("first_name") @db.VarChar(100)
+  lastName      String?   @map("last_name") @db.VarChar(100)
+  phone         String?   @db.VarChar(50)
+  roleId        String?   @map("role_id") @db.Uuid
+  avatarUrl     String?   @map("avatar_url") @db.VarChar(500)
+  isSuperAdmin  Boolean   @default(false) @map("is_super_admin")
+  isActive      Boolean   @default(true) @map("is_active")
+  lastLogin     DateTime? @map("last_login")
+  settings      Json      @default("{}")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  tenant             Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant             Tenant?             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   role               Role?               @relation(fields: [roleId], references: [id])
   sessions           Session[]
   refreshTokens      RefreshToken[]
@@ -297,7 +298,7 @@ model User {
   websitePages       WebsitePage[]       @relation("PageCreatedBy")
   auditLogs          AuditLog[]
 
-  @@unique([tenantId, email])
+  @@unique([email])
   @@index([tenantId])
   @@map("users")
 }

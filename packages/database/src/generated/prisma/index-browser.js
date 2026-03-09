@@ -192,6 +192,7 @@ exports.Prisma.UserScalarFieldEnum = {
   phone: 'phone',
   roleId: 'roleId',
   avatarUrl: 'avatarUrl',
+  isSuperAdmin: 'isSuperAdmin',
   isActive: 'isActive',
   lastLogin: 'lastLogin',
   settings: 'settings',

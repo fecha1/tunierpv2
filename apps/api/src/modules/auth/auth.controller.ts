@@ -4,6 +4,7 @@ import { JwtAuthGuard } from '../../shared/guards/jwt-auth.guard';
 import { Auth } from '../../shared/decorators';
 import type { AuthContext } from '@tunierp/auth';
 import { IsEmail, IsString, MinLength, IsOptional, IsIn } from 'class-validator';
+import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
 
 // ── DTOs ─────────────────────────────────────────────────
 
@@ -58,17 +59,23 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
   @HttpCode(HttpStatus.OK)
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto.email, dto.password);
   }
 
   @Post('register')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60000, limit: 3 } })
   async register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
   }
 
   @Post('refresh')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60000, limit: 10 } })
   @HttpCode(HttpStatus.OK)
   async refresh(@Body() dto: RefreshTokenDto) {
     return this.authService.refreshTokens(dto.refreshToken);

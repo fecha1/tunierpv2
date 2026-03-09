@@ -95,12 +95,17 @@ export default function OnboardingPage() {
   if (success) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f7fa' }}>
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', maxWidth: 480, padding: '0 20px' }}>
           <div style={{ fontSize: 64, marginBottom: 24 }}>🎉</div>
           <h2 style={{ fontSize: 24, fontWeight: 700, color: '#101c37', marginBottom: 12 }}>
             Bienvenue chez TuniERP !
           </h2>
-          <p style={{ color: '#666' }}>Votre entreprise a été créée. Redirection vers votre tableau de bord...</p>
+          <p style={{ color: '#666', marginBottom: 12 }}>Votre ERP est prêt avec les modules de base activés.</p>
+          <p style={{ color: '#888', fontSize: 13, lineHeight: 1.6 }}>
+            Les modules payants de votre plan seront activés par un administrateur sous 24h.
+            Vous recevrez une notification dès qu&apos;ils seront disponibles.
+          </p>
+          <p style={{ color: '#999', fontSize: 12, marginTop: 16 }}>Redirection vers votre tableau de bord...</p>
         </div>
       </div>
     );

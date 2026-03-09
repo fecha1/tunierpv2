@@ -11171,6 +11171,7 @@ export namespace Prisma {
     phone: string | null
     roleId: string | null
     avatarUrl: string | null
+    isSuperAdmin: boolean | null
     isActive: boolean | null
     lastLogin: Date | null
     createdAt: Date | null
@@ -11187,6 +11188,7 @@ export namespace Prisma {
     phone: string | null
     roleId: string | null
     avatarUrl: string | null
+    isSuperAdmin: boolean | null
     isActive: boolean | null
     lastLogin: Date | null
     createdAt: Date | null
@@ -11203,6 +11205,7 @@ export namespace Prisma {
     phone: number
     roleId: number
     avatarUrl: number
+    isSuperAdmin: number
     isActive: number
     lastLogin: number
     settings: number
@@ -11222,6 +11225,7 @@ export namespace Prisma {
     phone?: true
     roleId?: true
     avatarUrl?: true
+    isSuperAdmin?: true
     isActive?: true
     lastLogin?: true
     createdAt?: true
@@ -11238,6 +11242,7 @@ export namespace Prisma {
     phone?: true
     roleId?: true
     avatarUrl?: true
+    isSuperAdmin?: true
     isActive?: true
     lastLogin?: true
     createdAt?: true
@@ -11254,6 +11259,7 @@ export namespace Prisma {
     phone?: true
     roleId?: true
     avatarUrl?: true
+    isSuperAdmin?: true
     isActive?: true
     lastLogin?: true
     settings?: true
@@ -11336,7 +11342,7 @@ export namespace Prisma {
 
   export type UserGroupByOutputType = {
     id: string
-    tenantId: string
+    tenantId: string | null
     email: string
     passwordHash: string
     firstName: string | null
@@ -11344,6 +11350,7 @@ export namespace Prisma {
     phone: string | null
     roleId: string | null
     avatarUrl: string | null
+    isSuperAdmin: boolean
     isActive: boolean
     lastLogin: Date | null
     settings: JsonValue
@@ -11378,12 +11385,13 @@ export namespace Prisma {
     phone?: boolean
     roleId?: boolean
     avatarUrl?: boolean
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: boolean
     settings?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    tenant?: boolean | TenantDefaultArgs<ExtArgs>
+    tenant?: boolean | User$tenantArgs<ExtArgs>
     role?: boolean | User$roleArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     refreshTokens?: boolean | User$refreshTokensArgs<ExtArgs>
@@ -11407,12 +11415,13 @@ export namespace Prisma {
     phone?: boolean
     roleId?: boolean
     avatarUrl?: boolean
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: boolean
     settings?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    tenant?: boolean | TenantDefaultArgs<ExtArgs>
+    tenant?: boolean | User$tenantArgs<ExtArgs>
     role?: boolean | User$roleArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -11426,12 +11435,13 @@ export namespace Prisma {
     phone?: boolean
     roleId?: boolean
     avatarUrl?: boolean
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: boolean
     settings?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    tenant?: boolean | TenantDefaultArgs<ExtArgs>
+    tenant?: boolean | User$tenantArgs<ExtArgs>
     role?: boolean | User$roleArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -11445,6 +11455,7 @@ export namespace Prisma {
     phone?: boolean
     roleId?: boolean
     avatarUrl?: boolean
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: boolean
     settings?: boolean
@@ -11452,9 +11463,9 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "tenantId" | "email" | "passwordHash" | "firstName" | "lastName" | "phone" | "roleId" | "avatarUrl" | "isActive" | "lastLogin" | "settings" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "tenantId" | "email" | "passwordHash" | "firstName" | "lastName" | "phone" | "roleId" | "avatarUrl" | "isSuperAdmin" | "isActive" | "lastLogin" | "settings" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    tenant?: boolean | TenantDefaultArgs<ExtArgs>
+    tenant?: boolean | User$tenantArgs<ExtArgs>
     role?: boolean | User$roleArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     refreshTokens?: boolean | User$refreshTokensArgs<ExtArgs>
@@ -11468,18 +11479,18 @@ export namespace Prisma {
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    tenant?: boolean | TenantDefaultArgs<ExtArgs>
+    tenant?: boolean | User$tenantArgs<ExtArgs>
     role?: boolean | User$roleArgs<ExtArgs>
   }
   export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    tenant?: boolean | TenantDefaultArgs<ExtArgs>
+    tenant?: boolean | User$tenantArgs<ExtArgs>
     role?: boolean | User$roleArgs<ExtArgs>
   }
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
     objects: {
-      tenant: Prisma.$TenantPayload<ExtArgs>
+      tenant: Prisma.$TenantPayload<ExtArgs> | null
       role: Prisma.$RolePayload<ExtArgs> | null
       sessions: Prisma.$SessionPayload<ExtArgs>[]
       refreshTokens: Prisma.$RefreshTokenPayload<ExtArgs>[]
@@ -11493,7 +11504,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      tenantId: string
+      tenantId: string | null
       email: string
       passwordHash: string
       firstName: string | null
@@ -11501,6 +11512,7 @@ export namespace Prisma {
       phone: string | null
       roleId: string | null
       avatarUrl: string | null
+      isSuperAdmin: boolean
       isActive: boolean
       lastLogin: Date | null
       settings: Prisma.JsonValue
@@ -11900,7 +11912,7 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    tenant<T extends TenantDefaultArgs<ExtArgs> = {}>(args?: Subset<T, TenantDefaultArgs<ExtArgs>>): Prisma__TenantClient<$Result.GetResult<Prisma.$TenantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    tenant<T extends User$tenantArgs<ExtArgs> = {}>(args?: Subset<T, User$tenantArgs<ExtArgs>>): Prisma__TenantClient<$Result.GetResult<Prisma.$TenantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     role<T extends User$roleArgs<ExtArgs> = {}>(args?: Subset<T, User$roleArgs<ExtArgs>>): Prisma__RoleClient<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     refreshTokens<T extends User$refreshTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$refreshTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -11949,6 +11961,7 @@ export namespace Prisma {
     readonly phone: FieldRef<"User", 'String'>
     readonly roleId: FieldRef<"User", 'String'>
     readonly avatarUrl: FieldRef<"User", 'String'>
+    readonly isSuperAdmin: FieldRef<"User", 'Boolean'>
     readonly isActive: FieldRef<"User", 'Boolean'>
     readonly lastLogin: FieldRef<"User", 'DateTime'>
     readonly settings: FieldRef<"User", 'Json'>
@@ -12347,6 +12360,25 @@ export namespace Prisma {
      * Limit how many Users to delete.
      */
     limit?: number
+  }
+
+  /**
+   * User.tenant
+   */
+  export type User$tenantArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Tenant
+     */
+    select?: TenantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Tenant
+     */
+    omit?: TenantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TenantInclude<ExtArgs> | null
+    where?: TenantWhereInput
   }
 
   /**
@@ -45075,6 +45107,7 @@ export namespace Prisma {
     phone: 'phone',
     roleId: 'roleId',
     avatarUrl: 'avatarUrl',
+    isSuperAdmin: 'isSuperAdmin',
     isActive: 'isActive',
     lastLogin: 'lastLogin',
     settings: 'settings',
@@ -46366,7 +46399,7 @@ export namespace Prisma {
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     id?: UuidFilter<"User"> | string
-    tenantId?: UuidFilter<"User"> | string
+    tenantId?: UuidNullableFilter<"User"> | string | null
     email?: StringFilter<"User"> | string
     passwordHash?: StringFilter<"User"> | string
     firstName?: StringNullableFilter<"User"> | string | null
@@ -46374,12 +46407,13 @@ export namespace Prisma {
     phone?: StringNullableFilter<"User"> | string | null
     roleId?: UuidNullableFilter<"User"> | string | null
     avatarUrl?: StringNullableFilter<"User"> | string | null
+    isSuperAdmin?: BoolFilter<"User"> | boolean
     isActive?: BoolFilter<"User"> | boolean
     lastLogin?: DateTimeNullableFilter<"User"> | Date | string | null
     settings?: JsonFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
-    tenant?: XOR<TenantScalarRelationFilter, TenantWhereInput>
+    tenant?: XOR<TenantNullableScalarRelationFilter, TenantWhereInput> | null
     role?: XOR<RoleNullableScalarRelationFilter, RoleWhereInput> | null
     sessions?: SessionListRelationFilter
     refreshTokens?: RefreshTokenListRelationFilter
@@ -46394,7 +46428,7 @@ export namespace Prisma {
 
   export type UserOrderByWithRelationInput = {
     id?: SortOrder
-    tenantId?: SortOrder
+    tenantId?: SortOrderInput | SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
     firstName?: SortOrderInput | SortOrder
@@ -46402,6 +46436,7 @@ export namespace Prisma {
     phone?: SortOrderInput | SortOrder
     roleId?: SortOrderInput | SortOrder
     avatarUrl?: SortOrderInput | SortOrder
+    isSuperAdmin?: SortOrder
     isActive?: SortOrder
     lastLogin?: SortOrderInput | SortOrder
     settings?: SortOrder
@@ -46422,24 +46457,24 @@ export namespace Prisma {
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    tenantId_email?: UserTenantIdEmailCompoundUniqueInput
+    email?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
-    tenantId?: UuidFilter<"User"> | string
-    email?: StringFilter<"User"> | string
+    tenantId?: UuidNullableFilter<"User"> | string | null
     passwordHash?: StringFilter<"User"> | string
     firstName?: StringNullableFilter<"User"> | string | null
     lastName?: StringNullableFilter<"User"> | string | null
     phone?: StringNullableFilter<"User"> | string | null
     roleId?: UuidNullableFilter<"User"> | string | null
     avatarUrl?: StringNullableFilter<"User"> | string | null
+    isSuperAdmin?: BoolFilter<"User"> | boolean
     isActive?: BoolFilter<"User"> | boolean
     lastLogin?: DateTimeNullableFilter<"User"> | Date | string | null
     settings?: JsonFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
-    tenant?: XOR<TenantScalarRelationFilter, TenantWhereInput>
+    tenant?: XOR<TenantNullableScalarRelationFilter, TenantWhereInput> | null
     role?: XOR<RoleNullableScalarRelationFilter, RoleWhereInput> | null
     sessions?: SessionListRelationFilter
     refreshTokens?: RefreshTokenListRelationFilter
@@ -46450,11 +46485,11 @@ export namespace Prisma {
     inventoryMovements?: InventoryMovementListRelationFilter
     websitePages?: WebsitePageListRelationFilter
     auditLogs?: AuditLogListRelationFilter
-  }, "id" | "tenantId_email">
+  }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
-    tenantId?: SortOrder
+    tenantId?: SortOrderInput | SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
     firstName?: SortOrderInput | SortOrder
@@ -46462,6 +46497,7 @@ export namespace Prisma {
     phone?: SortOrderInput | SortOrder
     roleId?: SortOrderInput | SortOrder
     avatarUrl?: SortOrderInput | SortOrder
+    isSuperAdmin?: SortOrder
     isActive?: SortOrder
     lastLogin?: SortOrderInput | SortOrder
     settings?: SortOrder
@@ -46477,7 +46513,7 @@ export namespace Prisma {
     OR?: UserScalarWhereWithAggregatesInput[]
     NOT?: UserScalarWhereWithAggregatesInput | UserScalarWhereWithAggregatesInput[]
     id?: UuidWithAggregatesFilter<"User"> | string
-    tenantId?: UuidWithAggregatesFilter<"User"> | string
+    tenantId?: UuidNullableWithAggregatesFilter<"User"> | string | null
     email?: StringWithAggregatesFilter<"User"> | string
     passwordHash?: StringWithAggregatesFilter<"User"> | string
     firstName?: StringNullableWithAggregatesFilter<"User"> | string | null
@@ -46485,6 +46521,7 @@ export namespace Prisma {
     phone?: StringNullableWithAggregatesFilter<"User"> | string | null
     roleId?: UuidNullableWithAggregatesFilter<"User"> | string | null
     avatarUrl?: StringNullableWithAggregatesFilter<"User"> | string | null
+    isSuperAdmin?: BoolWithAggregatesFilter<"User"> | boolean
     isActive?: BoolWithAggregatesFilter<"User"> | boolean
     lastLogin?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     settings?: JsonWithAggregatesFilter<"User">
@@ -49690,12 +49727,13 @@ export namespace Prisma {
     lastName?: string | null
     phone?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    tenant: TenantCreateNestedOneWithoutUsersInput
+    tenant?: TenantCreateNestedOneWithoutUsersInput
     role?: RoleCreateNestedOneWithoutUsersInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
@@ -49710,7 +49748,7 @@ export namespace Prisma {
 
   export type UserUncheckedCreateInput = {
     id?: string
-    tenantId: string
+    tenantId?: string | null
     email: string
     passwordHash: string
     firstName?: string | null
@@ -49718,6 +49756,7 @@ export namespace Prisma {
     phone?: string | null
     roleId?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -49742,12 +49781,13 @@ export namespace Prisma {
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    tenant?: TenantUpdateOneRequiredWithoutUsersNestedInput
+    tenant?: TenantUpdateOneWithoutUsersNestedInput
     role?: RoleUpdateOneWithoutUsersNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
@@ -49762,7 +49802,7 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    tenantId?: StringFieldUpdateOperationsInput | string
+    tenantId?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49770,6 +49810,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     roleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -49788,7 +49829,7 @@ export namespace Prisma {
 
   export type UserCreateManyInput = {
     id?: string
-    tenantId: string
+    tenantId?: string | null
     email: string
     passwordHash: string
     firstName?: string | null
@@ -49796,6 +49837,7 @@ export namespace Prisma {
     phone?: string | null
     roleId?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -49811,6 +49853,7 @@ export namespace Prisma {
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -49820,7 +49863,7 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    tenantId?: StringFieldUpdateOperationsInput | string
+    tenantId?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49828,6 +49871,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     roleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -53599,6 +53643,11 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type TenantNullableScalarRelationFilter = {
+    is?: TenantWhereInput | null
+    isNot?: TenantWhereInput | null
+  }
+
   export type RoleNullableScalarRelationFilter = {
     is?: RoleWhereInput | null
     isNot?: RoleWhereInput | null
@@ -53639,11 +53688,6 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
-  export type UserTenantIdEmailCompoundUniqueInput = {
-    tenantId: string
-    email: string
-  }
-
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     tenantId?: SortOrder
@@ -53654,6 +53698,7 @@ export namespace Prisma {
     phone?: SortOrder
     roleId?: SortOrder
     avatarUrl?: SortOrder
+    isSuperAdmin?: SortOrder
     isActive?: SortOrder
     lastLogin?: SortOrder
     settings?: SortOrder
@@ -53671,6 +53716,7 @@ export namespace Prisma {
     phone?: SortOrder
     roleId?: SortOrder
     avatarUrl?: SortOrder
+    isSuperAdmin?: SortOrder
     isActive?: SortOrder
     lastLogin?: SortOrder
     createdAt?: SortOrder
@@ -53687,6 +53733,7 @@ export namespace Prisma {
     phone?: SortOrder
     roleId?: SortOrder
     avatarUrl?: SortOrder
+    isSuperAdmin?: SortOrder
     isActive?: SortOrder
     lastLogin?: SortOrder
     createdAt?: SortOrder
@@ -56743,10 +56790,12 @@ export namespace Prisma {
     set?: Date | string | null
   }
 
-  export type TenantUpdateOneRequiredWithoutUsersNestedInput = {
+  export type TenantUpdateOneWithoutUsersNestedInput = {
     create?: XOR<TenantCreateWithoutUsersInput, TenantUncheckedCreateWithoutUsersInput>
     connectOrCreate?: TenantCreateOrConnectWithoutUsersInput
     upsert?: TenantUpsertWithoutUsersInput
+    disconnect?: TenantWhereInput | boolean
+    delete?: TenantWhereInput | boolean
     connect?: TenantWhereUniqueInput
     update?: XOR<XOR<TenantUpdateToOneWithWhereWithoutUsersInput, TenantUpdateWithoutUsersInput>, TenantUncheckedUpdateWithoutUsersInput>
   }
@@ -59735,6 +59784,7 @@ export namespace Prisma {
     lastName?: string | null
     phone?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -59761,6 +59811,7 @@ export namespace Prisma {
     phone?: string | null
     roleId?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -60666,7 +60717,7 @@ export namespace Prisma {
     OR?: UserScalarWhereInput[]
     NOT?: UserScalarWhereInput | UserScalarWhereInput[]
     id?: UuidFilter<"User"> | string
-    tenantId?: UuidFilter<"User"> | string
+    tenantId?: UuidNullableFilter<"User"> | string | null
     email?: StringFilter<"User"> | string
     passwordHash?: StringFilter<"User"> | string
     firstName?: StringNullableFilter<"User"> | string | null
@@ -60674,6 +60725,7 @@ export namespace Prisma {
     phone?: StringNullableFilter<"User"> | string | null
     roleId?: UuidNullableFilter<"User"> | string | null
     avatarUrl?: StringNullableFilter<"User"> | string | null
+    isSuperAdmin?: BoolFilter<"User"> | boolean
     isActive?: BoolFilter<"User"> | boolean
     lastLogin?: DateTimeNullableFilter<"User"> | Date | string | null
     settings?: JsonFilter<"User">
@@ -62917,12 +62969,13 @@ export namespace Prisma {
     lastName?: string | null
     phone?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    tenant: TenantCreateNestedOneWithoutUsersInput
+    tenant?: TenantCreateNestedOneWithoutUsersInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
     mfaConfig?: MfaConfigCreateNestedOneWithoutUserInput
@@ -62936,13 +62989,14 @@ export namespace Prisma {
 
   export type UserUncheckedCreateWithoutRoleInput = {
     id?: string
-    tenantId: string
+    tenantId?: string | null
     email: string
     passwordHash: string
     firstName?: string | null
     lastName?: string | null
     phone?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -63080,12 +63134,13 @@ export namespace Prisma {
     lastName?: string | null
     phone?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    tenant: TenantCreateNestedOneWithoutUsersInput
+    tenant?: TenantCreateNestedOneWithoutUsersInput
     role?: RoleCreateNestedOneWithoutUsersInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
     mfaConfig?: MfaConfigCreateNestedOneWithoutUserInput
@@ -63099,7 +63154,7 @@ export namespace Prisma {
 
   export type UserUncheckedCreateWithoutSessionsInput = {
     id?: string
-    tenantId: string
+    tenantId?: string | null
     email: string
     passwordHash: string
     firstName?: string | null
@@ -63107,6 +63162,7 @@ export namespace Prisma {
     phone?: string | null
     roleId?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -63146,12 +63202,13 @@ export namespace Prisma {
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    tenant?: TenantUpdateOneRequiredWithoutUsersNestedInput
+    tenant?: TenantUpdateOneWithoutUsersNestedInput
     role?: RoleUpdateOneWithoutUsersNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
     mfaConfig?: MfaConfigUpdateOneWithoutUserNestedInput
@@ -63165,7 +63222,7 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    tenantId?: StringFieldUpdateOperationsInput | string
+    tenantId?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -63173,6 +63230,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     roleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -63196,12 +63254,13 @@ export namespace Prisma {
     lastName?: string | null
     phone?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    tenant: TenantCreateNestedOneWithoutUsersInput
+    tenant?: TenantCreateNestedOneWithoutUsersInput
     role?: RoleCreateNestedOneWithoutUsersInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     mfaConfig?: MfaConfigCreateNestedOneWithoutUserInput
@@ -63215,7 +63274,7 @@ export namespace Prisma {
 
   export type UserUncheckedCreateWithoutRefreshTokensInput = {
     id?: string
-    tenantId: string
+    tenantId?: string | null
     email: string
     passwordHash: string
     firstName?: string | null
@@ -63223,6 +63282,7 @@ export namespace Prisma {
     phone?: string | null
     roleId?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -63262,12 +63322,13 @@ export namespace Prisma {
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    tenant?: TenantUpdateOneRequiredWithoutUsersNestedInput
+    tenant?: TenantUpdateOneWithoutUsersNestedInput
     role?: RoleUpdateOneWithoutUsersNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     mfaConfig?: MfaConfigUpdateOneWithoutUserNestedInput
@@ -63281,7 +63342,7 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateWithoutRefreshTokensInput = {
     id?: StringFieldUpdateOperationsInput | string
-    tenantId?: StringFieldUpdateOperationsInput | string
+    tenantId?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -63289,6 +63350,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     roleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -63312,12 +63374,13 @@ export namespace Prisma {
     lastName?: string | null
     phone?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    tenant: TenantCreateNestedOneWithoutUsersInput
+    tenant?: TenantCreateNestedOneWithoutUsersInput
     role?: RoleCreateNestedOneWithoutUsersInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
@@ -63331,7 +63394,7 @@ export namespace Prisma {
 
   export type UserUncheckedCreateWithoutMfaConfigInput = {
     id?: string
-    tenantId: string
+    tenantId?: string | null
     email: string
     passwordHash: string
     firstName?: string | null
@@ -63339,6 +63402,7 @@ export namespace Prisma {
     phone?: string | null
     roleId?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -63378,12 +63442,13 @@ export namespace Prisma {
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    tenant?: TenantUpdateOneRequiredWithoutUsersNestedInput
+    tenant?: TenantUpdateOneWithoutUsersNestedInput
     role?: RoleUpdateOneWithoutUsersNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
@@ -63397,7 +63462,7 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateWithoutMfaConfigInput = {
     id?: StringFieldUpdateOperationsInput | string
-    tenantId?: StringFieldUpdateOperationsInput | string
+    tenantId?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -63405,6 +63470,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     roleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -63509,12 +63575,13 @@ export namespace Prisma {
     lastName?: string | null
     phone?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    tenant: TenantCreateNestedOneWithoutUsersInput
+    tenant?: TenantCreateNestedOneWithoutUsersInput
     role?: RoleCreateNestedOneWithoutUsersInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
@@ -63528,7 +63595,7 @@ export namespace Prisma {
 
   export type UserUncheckedCreateWithoutAuditLogsInput = {
     id?: string
-    tenantId: string
+    tenantId?: string | null
     email: string
     passwordHash: string
     firstName?: string | null
@@ -63536,6 +63603,7 @@ export namespace Prisma {
     phone?: string | null
     roleId?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -63662,12 +63730,13 @@ export namespace Prisma {
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    tenant?: TenantUpdateOneRequiredWithoutUsersNestedInput
+    tenant?: TenantUpdateOneWithoutUsersNestedInput
     role?: RoleUpdateOneWithoutUsersNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
@@ -63681,7 +63750,7 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateWithoutAuditLogsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    tenantId?: StringFieldUpdateOperationsInput | string
+    tenantId?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -63689,6 +63758,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     roleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -66666,12 +66736,13 @@ export namespace Prisma {
     lastName?: string | null
     phone?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    tenant: TenantCreateNestedOneWithoutUsersInput
+    tenant?: TenantCreateNestedOneWithoutUsersInput
     role?: RoleCreateNestedOneWithoutUsersInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
@@ -66685,7 +66756,7 @@ export namespace Prisma {
 
   export type UserUncheckedCreateWithoutInventoryMovementsInput = {
     id?: string
-    tenantId: string
+    tenantId?: string | null
     email: string
     passwordHash: string
     firstName?: string | null
@@ -66693,6 +66764,7 @@ export namespace Prisma {
     phone?: string | null
     roleId?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -66883,12 +66955,13 @@ export namespace Prisma {
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    tenant?: TenantUpdateOneRequiredWithoutUsersNestedInput
+    tenant?: TenantUpdateOneWithoutUsersNestedInput
     role?: RoleUpdateOneWithoutUsersNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
@@ -66902,7 +66975,7 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateWithoutInventoryMovementsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    tenantId?: StringFieldUpdateOperationsInput | string
+    tenantId?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -66910,6 +66983,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     roleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -67744,12 +67818,13 @@ export namespace Prisma {
     lastName?: string | null
     phone?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    tenant: TenantCreateNestedOneWithoutUsersInput
+    tenant?: TenantCreateNestedOneWithoutUsersInput
     role?: RoleCreateNestedOneWithoutUsersInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
@@ -67763,7 +67838,7 @@ export namespace Prisma {
 
   export type UserUncheckedCreateWithoutSalesCreatedInput = {
     id?: string
-    tenantId: string
+    tenantId?: string | null
     email: string
     passwordHash: string
     firstName?: string | null
@@ -67771,6 +67846,7 @@ export namespace Prisma {
     phone?: string | null
     roleId?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -68250,12 +68326,13 @@ export namespace Prisma {
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    tenant?: TenantUpdateOneRequiredWithoutUsersNestedInput
+    tenant?: TenantUpdateOneWithoutUsersNestedInput
     role?: RoleUpdateOneWithoutUsersNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
@@ -68269,7 +68346,7 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateWithoutSalesCreatedInput = {
     id?: StringFieldUpdateOperationsInput | string
-    tenantId?: StringFieldUpdateOperationsInput | string
+    tenantId?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -68277,6 +68354,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     roleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -69375,12 +69453,13 @@ export namespace Prisma {
     lastName?: string | null
     phone?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    tenant: TenantCreateNestedOneWithoutUsersInput
+    tenant?: TenantCreateNestedOneWithoutUsersInput
     role?: RoleCreateNestedOneWithoutUsersInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
@@ -69394,7 +69473,7 @@ export namespace Prisma {
 
   export type UserUncheckedCreateWithoutPaymentsCreatedInput = {
     id?: string
-    tenantId: string
+    tenantId?: string | null
     email: string
     passwordHash: string
     firstName?: string | null
@@ -69402,6 +69481,7 @@ export namespace Prisma {
     phone?: string | null
     roleId?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -69829,12 +69909,13 @@ export namespace Prisma {
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    tenant?: TenantUpdateOneRequiredWithoutUsersNestedInput
+    tenant?: TenantUpdateOneWithoutUsersNestedInput
     role?: RoleUpdateOneWithoutUsersNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
@@ -69848,7 +69929,7 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateWithoutPaymentsCreatedInput = {
     id?: StringFieldUpdateOperationsInput | string
-    tenantId?: StringFieldUpdateOperationsInput | string
+    tenantId?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -69856,6 +69937,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     roleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -70508,12 +70590,13 @@ export namespace Prisma {
     lastName?: string | null
     phone?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    tenant: TenantCreateNestedOneWithoutUsersInput
+    tenant?: TenantCreateNestedOneWithoutUsersInput
     role?: RoleCreateNestedOneWithoutUsersInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
@@ -70527,7 +70610,7 @@ export namespace Prisma {
 
   export type UserUncheckedCreateWithoutPurchasesCreatedInput = {
     id?: string
-    tenantId: string
+    tenantId?: string | null
     email: string
     passwordHash: string
     firstName?: string | null
@@ -70535,6 +70618,7 @@ export namespace Prisma {
     phone?: string | null
     roleId?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -70837,12 +70921,13 @@ export namespace Prisma {
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    tenant?: TenantUpdateOneRequiredWithoutUsersNestedInput
+    tenant?: TenantUpdateOneWithoutUsersNestedInput
     role?: RoleUpdateOneWithoutUsersNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
@@ -70856,7 +70941,7 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateWithoutPurchasesCreatedInput = {
     id?: StringFieldUpdateOperationsInput | string
-    tenantId?: StringFieldUpdateOperationsInput | string
+    tenantId?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -70864,6 +70949,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     roleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -71403,12 +71489,13 @@ export namespace Prisma {
     lastName?: string | null
     phone?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    tenant: TenantCreateNestedOneWithoutUsersInput
+    tenant?: TenantCreateNestedOneWithoutUsersInput
     role?: RoleCreateNestedOneWithoutUsersInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
@@ -71422,7 +71509,7 @@ export namespace Prisma {
 
   export type UserUncheckedCreateWithoutWebsitePagesInput = {
     id?: string
-    tenantId: string
+    tenantId?: string | null
     email: string
     passwordHash: string
     firstName?: string | null
@@ -71430,6 +71517,7 @@ export namespace Prisma {
     phone?: string | null
     roleId?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -71591,12 +71679,13 @@ export namespace Prisma {
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    tenant?: TenantUpdateOneRequiredWithoutUsersNestedInput
+    tenant?: TenantUpdateOneWithoutUsersNestedInput
     role?: RoleUpdateOneWithoutUsersNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
@@ -71610,7 +71699,7 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateWithoutWebsitePagesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    tenantId?: StringFieldUpdateOperationsInput | string
+    tenantId?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -71618,6 +71707,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     roleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -71810,6 +71900,7 @@ export namespace Prisma {
     phone?: string | null
     roleId?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -72100,6 +72191,7 @@ export namespace Prisma {
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -72126,6 +72218,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     roleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -72151,6 +72244,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     roleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -73769,13 +73863,14 @@ export namespace Prisma {
 
   export type UserCreateManyRoleInput = {
     id?: string
-    tenantId: string
+    tenantId?: string | null
     email: string
     passwordHash: string
     firstName?: string | null
     lastName?: string | null
     phone?: string | null
     avatarUrl?: string | null
+    isSuperAdmin?: boolean
     isActive?: boolean
     lastLogin?: Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -73791,12 +73886,13 @@ export namespace Prisma {
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    tenant?: TenantUpdateOneRequiredWithoutUsersNestedInput
+    tenant?: TenantUpdateOneWithoutUsersNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
     mfaConfig?: MfaConfigUpdateOneWithoutUserNestedInput
@@ -73810,13 +73906,14 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateWithoutRoleInput = {
     id?: StringFieldUpdateOperationsInput | string
-    tenantId?: StringFieldUpdateOperationsInput | string
+    tenantId?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue
@@ -73835,13 +73932,14 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateManyWithoutRoleInput = {
     id?: StringFieldUpdateOperationsInput | string
-    tenantId?: StringFieldUpdateOperationsInput | string
+    tenantId?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isSuperAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     settings?: JsonNullValueInput | InputJsonValue

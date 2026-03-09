@@ -266,6 +266,18 @@
   # Seeder la base
   pnpm run db:seed
 
+
+================================================================================
+  8. COMPTES & MOTS DE PASSE (seed)
+================================================================================
+
+  Super Admin 1:   super1@tunierp.tn       / SuperAdmin@2026!
+  Super Admin 2:   super2@tunierp.tn       / SuperAdmin@2026!
+  Demo Admin:      admin@demo.tunierp.tn   / demo1234
+
+  Note: Les super admins appartiennent au tenant "platform" (tenantId nullable).
+        Le demo admin appartient au tenant "Entreprise Démo" (slug: demo).
+
   # Lancer tout en dev (Turborepo parallel)
   pnpm run dev
 

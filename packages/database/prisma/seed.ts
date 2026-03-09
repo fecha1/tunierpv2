@@ -133,6 +133,69 @@ async function main() {
   }
   console.log(`  ✅  Paid modules linked to Business+ plans`);
 
+  // ── PLATFORM TENANT + SUPER ADMINS ─────────────────────
+  const platformTenant = await prisma.tenant.upsert({
+    where: { slug: 'platform' },
+    update: {},
+    create: {
+      name: 'TuniERP Platform',
+      slug: 'platform',
+      schemaName: 'tenant_platform',
+      businessType: 'general',
+      status: 'active',
+      settings: { language: 'fr', dateFormat: 'DD/MM/YYYY', numberFormat: '1.000,000' },
+    },
+  });
+  console.log(`  ✅  Platform tenant: ${platformTenant.id}`);
+
+  // Create super admin role for platform tenant
+  const superAdminRole = await prisma.role.upsert({
+    where: { tenantId_code: { tenantId: platformTenant.id, code: 'super_admin' } },
+    update: {},
+    create: {
+      tenantId: platformTenant.id,
+      name: 'Super Administrateur',
+      code: 'super_admin',
+      level: 100,
+      isSystem: true,
+      permissions: ['*'],
+    },
+  });
+
+  // Create 2 super admin users
+  const superAdminHash = await bcrypt.hash('SuperAdmin@2026!', 12);
+
+  await prisma.user.upsert({
+    where: { tenantId_email: { tenantId: platformTenant.id, email: 'super1@tunierp.tn' } },
+    update: {},
+    create: {
+      tenantId: platformTenant.id,
+      email: 'super1@tunierp.tn',
+      passwordHash: superAdminHash,
+      firstName: 'Super',
+      lastName: 'Admin 1',
+      roleId: superAdminRole.id,
+      isSuperAdmin: true,
+      isActive: true,
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { tenantId_email: { tenantId: platformTenant.id, email: 'super2@tunierp.tn' } },
+    update: {},
+    create: {
+      tenantId: platformTenant.id,
+      email: 'super2@tunierp.tn',
+      passwordHash: superAdminHash,
+      firstName: 'Super',
+      lastName: 'Admin 2',
+      roleId: superAdminRole.id,
+      isSuperAdmin: true,
+      isActive: true,
+    },
+  });
+  console.log(`  ✅  2 super admin users created`);
+
   // 5. Create demo tenant
   const starterPlan = allPlans.find((p) => p.code === 'starter')!;
   const demoTenant = await prisma.tenant.upsert({
